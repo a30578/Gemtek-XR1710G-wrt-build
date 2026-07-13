@@ -1,0 +1,8 @@
+#!/bin/sh
+# generate secret key
+[ -n "$(uci -q get teleproxy.default.secret)" ] || {
+	#SECRET=$(dd if=/dev/urandom bs=16 count=1 2>/dev/null | hexdump -v -e '16/1 "%02x"')
+	SECRET=$(/usr/bin/teleproxy generate-secret)
+	uci set teleproxy.default.secret="$SECRET"
+	uci commit teleproxy
+}

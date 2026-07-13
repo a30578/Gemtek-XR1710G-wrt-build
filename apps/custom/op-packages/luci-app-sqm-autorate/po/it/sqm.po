@@ -1,0 +1,211 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2021-09-09 08:44+0000\n"
+"Last-Translator: pisquan8 <cimurro@outlook.de>\n"
+"Language-Team: Italian <https://hosted.weblate.org/projects/openwrt/"
+"luciapplicationssqm/it/>\n"
+"Language: it\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.8.1-dev\n"
+
+msgid ""
+"Advanced option string to pass to the egress queueing disciplines; no error "
+"checking, use very carefully."
+msgstr ""
+"Stringa di opzioni avanzate da passare alle discipline di coda in uscita; "
+"nessun controllo errori, usare con molta cautela."
+
+msgid ""
+"Advanced option string to pass to the ingress queueing disciplines; no error "
+"checking, use very carefully."
+msgstr ""
+"Stringa di opzioni avanzate da passare alle discipline di coda in ingresso; "
+"nessun controllo errori, usare con molta cautela."
+
+msgid "Basic Settings"
+msgstr "Impostazioni di base"
+
+msgid ""
+"Create log file for this SQM instance under /var/run/sqm/${Interface_name}."
+"[start|stop]-sqm.log."
+msgstr ""
+"Crea file di log per questa istanza SQM in /var/run/sqm/${Interface_name}."
+"[start|stop]-sqm.log."
+
+msgid ""
+"Download speed (kbit/s) (ingress) set to 0 to selectively disable ingress "
+"shaping:"
+msgstr ""
+"Velocita di download (kbit/s) (ingress) impostata a 0 per disabilitare "
+"selettivamente lo shaping in ingresso:"
+
+msgid "Enable SQM"
+msgstr "Abilita SQM"
+
+msgid "Enable this SQM instance."
+msgstr "Abilita questa istanza SQM."
+
+msgid ""
+"Explicit congestion notification (ECN) status on inbound packets (ingress):"
+msgstr ""
+"Stato ECN (Explicit Congestion Notification) sui pacchetti in ingresso "
+"(ingress):"
+
+msgid ""
+"Explicit congestion notification (ECN) status on outbound packets (egress)."
+msgstr ""
+"Stato ECN (Explicit Congestion Notification) sui pacchetti in uscita "
+"(egress)."
+
+msgid "Grant UCI access for luci-app-sqm"
+msgstr "Concedi accesso UCI a luci-app-sqm"
+
+msgid "Hard limit on egress queues; leave empty for default."
+msgstr "Limite rigido sulle code in uscita; lascia vuoto per il predefinito."
+
+msgid "Hard limit on ingress queues; leave empty for default."
+msgstr "Limite rigido sulle code in ingresso; lascia vuoto per il predefinito."
+
+msgid "Ignore DSCP on ingress:"
+msgstr "Ignora DSCP in ingresso:"
+
+msgid ""
+"Latency target for egress, e.g. 5ms [units: s, ms, or us]; leave empty for "
+"automatic selection, put in the word default for the qdisc's default."
+msgstr ""
+"Target di latenza per egress, es. 5ms [unita: s, ms o us]; lascia vuoto per "
+"selezione automatica, inserisci default per il valore predefinito del qdisc."
+
+msgid ""
+"Latency target for ingress, e.g 5ms [units: s, ms, or us]; leave empty for "
+"automatic selection, put in the word default for the qdisc's default."
+msgstr ""
+"Target di latenza per ingress, es. 5ms [unita: s, ms o us]; lascia vuoto per "
+"selezione automatica, inserisci default per il valore predefinito del qdisc."
+
+msgid "Link Layer Adaptation"
+msgstr "Adattamento livello link"
+
+msgid ""
+"Maximal Size for size and rate calculations, tcMTU (byte); needs to be >= "
+"interface MTU + overhead:"
+msgstr ""
+"Dimensione massima per i calcoli di dimensione e velocita, tcMTU (byte); "
+"deve essere >= MTU interfaccia + overhead:"
+
+msgid ""
+"Minimal packet size, MPU (byte); needs to be > 0 for ethernet size tables:"
+msgstr ""
+"Dimensione minima pacchetto, MPU (byte); deve essere > 0 per le tabelle "
+"dimensione ethernet:"
+
+msgid ""
+"Number of entries in size/rate tables, TSIZE; for ATM choose TSIZE = (tcMTU "
+"+ 1) / 16:"
+msgstr ""
+"Numero di voci nelle tabelle dimensione/velocita, TSIZE; per ATM scegliere "
+"TSIZE = (tcMTU + 1) / 16:"
+
+msgid "Per Packet Overhead (byte):"
+msgstr "Overhead per pacchetto (byte):"
+
+msgid "Queue Discipline"
+msgstr "Disciplina di coda"
+
+msgid "Queue setup script"
+msgstr "Script configurazione coda"
+
+msgid "Queues"
+msgstr "Code"
+
+msgid ""
+"Queuing disciplines useable on this system. After installing a new qdisc, "
+"you need to restart the router to see updates!"
+msgstr ""
+"Discipline di coda utilizzabili su questo sistema. Dopo aver installato un "
+"nuovo qdisc, devi riavviare il router per vedere gli aggiornamenti!"
+
+msgid "SQM QoS"
+msgstr "SQM QoS"
+
+msgid ""
+"Show Advanced Linklayer Options, (only needed if MTU > 1500). Advanced "
+"options will only be used as long as this box is checked."
+msgstr ""
+"Mostra opzioni avanzate linklayer (necessarie solo se MTU > 1500). Le "
+"opzioni avanzate saranno usate solo finche questa casella e selezionata."
+
+msgid ""
+"Show and Use Advanced Configuration. Advanced options will only be used as "
+"long as this box is checked."
+msgstr ""
+"Mostra e usa configurazione avanzata. Le opzioni avanzate saranno usate solo "
+"finche questa casella e selezionata."
+
+msgid ""
+"Show and Use Dangerous Configuration. Dangerous options will only be used as "
+"long as this box is checked."
+msgstr ""
+"Mostra e usa configurazione pericolosa. Le opzioni pericolose saranno usate "
+"solo finche questa casella e selezionata."
+
+msgid "Smart Queue Management"
+msgstr "Smart Queue Management"
+
+msgid "Squash DSCP on inbound packets (ingress):"
+msgstr "Azzera DSCP sui pacchetti in ingresso (ingress):"
+
+msgid ""
+"The SQM GUI has just enabled the sqm initscript on your behalf. Remember to "
+"disable the sqm initscript manually under System Startup menu in case this "
+"change was not wished for."
+msgstr ""
+"La GUI SQM ha appena abilitato lo script di init sqm per tuo conto. Ricorda "
+"di disabilitare manualmente lo script di init sqm nel menu Avvio sistema se "
+"questa modifica non era desiderata."
+
+msgid ""
+"The SQM service seems to be disabled. Please use the button below to "
+"activate this service."
+msgstr ""
+"Il servizio SQM sembra disabilitato. Usa il pulsante qui sotto per attivare "
+"questo servizio."
+
+msgid ""
+"Upload speed (kbit/s) (egress) set to 0 to selectively disable egress "
+"shaping:"
+msgstr ""
+"Velocita di upload (kbit/s) (egress) impostata a 0 per disabilitare "
+"selettivamente lo shaping in uscita:"
+
+msgid "Verbosity of SQM's output into the system log."
+msgstr "Verbosita dell'output SQM nel log di sistema."
+
+msgid "Which link layer to account for:"
+msgstr "Quale livello link considerare:"
+
+msgid "Which linklayer adaptation mechanism to use; for testing only"
+msgstr "Quale meccanismo di adattamento linklayer usare; solo per test"
+
+msgid ""
+"With <abbr title=\"Smart Queue Management\">SQM</abbr> you can enable "
+"traffic shaping, better mixing (Fair Queueing), active queue length "
+"management (AQM) and prioritisation on one network interface."
+msgstr ""
+"Con <abbr title=\"Smart Queue Management\">SQM</abbr> puoi abilitare traffic "
+"shaping, migliore distribuzione (Fair Queueing), gestione attiva della coda "
+"(AQM) e prioritizzazione su una interfaccia di rete."
+
+#: applications/luci-app-sqm/htdocs/luci-static/resources/view/network/sqm.js:89
+msgid "Interface name"
+msgstr "Nome interfaccia"
+
+#: applications/luci-app-sqm/htdocs/luci-static/resources/view/network/sqm.js:107
+#: applications/luci-app-sqm/htdocs/luci-static/resources/view/network/sqm.js:149
+#: applications/luci-app-sqm/htdocs/luci-static/resources/view/network/sqm.js:155
+#: applications/luci-app-sqm/htdocs/luci-static/resources/view/network/sqm.js:188
+#: applications/luci-app-sqm/htdocs/luci-static/resources/view/network/sqm.js:219
+msgid "default"
+msgstr "predefinito"

@@ -1,0 +1,162 @@
+'use strict';
+'require form';
+'require rpc';
+'require fs';
+'require view';
+'require uci';
+'require ui';
+'require tools.widgets as widgets'
+
+
+/*
+	Written by Konstantine Shevlakov at <shevlakov@132lan.ru> 2023 - 2026
+
+	Licensed to the GNU General Public License v3.0.
+
+*/
+
+var callSerialPort = rpc.declare({
+	object: 'file',
+	method: 'list',
+	params: [ 'path' ],
+	expect: { entries: [] },
+	filter: function(list, params) {
+		var rv = [];
+		for (var i = 0; i < list.length; i++)
+			if (list[i].name.match(/^ttyACM/) ||
+				list[i].name.match(/^ttyUSB/) ||
+				list[i].name.match(/^wwan\d+at\d+/))
+				rv.push(params.path + list[i].name);
+		return rv.sort((a, b) => a.name > b.name);
+	}
+});
+
+var callQMIPort = rpc.declare({
+        object: 'file',
+        method: 'list',
+        params: [ 'path' ],
+        expect: { entries: [] },
+        filter: function(list, params) {
+                var rv = [];
+                for (var i = 0; i < list.length; i++)
+                        if (list[i].name.match(/^cdc-wdm/))
+                                rv.push(params.path + list[i].name);
+                return rv.sort();
+        }
+});
+
+var callCheckQmiinfo = rpc.declare({
+        object: 'file',
+        method: 'stat',
+        params: [ 'path' ],
+        expect: { '': {} }
+});
+
+var maindesc = _('Modeminfo: Configuration');
+var mdesc = _('Configuration panel of Modeminfo.');
+var qfdesc = _('Get modem data via qmi. Require install qminfo.');
+var sdesc = _('Select serial port.');
+var qdesc = _('Select qmi port.');
+var lacdec = _('Show LAC and CID in decimal.');
+var mmdesc = _('Get device hardware name via mmcli utility if aviable.');
+var qmidesc = _('Set qmi mode.');
+var idesc = _('Show short info.<br />Overview: show info on main page \"Cellular Network\" section<br />MenuBar: show info on menubar all pages<br />NOTICE: Do not add too many modems in menubar, it may break the theme display.');
+var portplace = _('Please select a port');
+
+return view.extend({
+
+	load: function() {
+		return callCheckQmiinfo('/usr/bin/qminfo')
+			.then(function(stat) {
+				return (stat && stat.size != null);
+			})
+			.catch(function() {
+				return false;
+			});
+	},
+
+	render: function(qmiinfoInstalled){
+
+		var qfdesc = qmiinfoInstalled
+			? _('Get modem data via qmi.')
+			: _('Please install qminfo package.');
+
+		var m, s, o;
+
+		m = new form.Map('modeminfo', maindesc, mdesc);
+
+		s = m.section(form.TypedSection, 'general', _('General option'), null);
+		s.anonymous = true;
+
+		o = s.option(form.ListValue, 'index', _('Short info'), idesc);
+		o.widget="radio";
+		o.value(0,_('none'));
+		o.value(1,_('overview'));
+		o.value(2,_('menubar'));
+		o.default = '0';
+		o.rmempty = true;
+
+		o = s.option(form.Flag, 'decimail', _('Show decimal'), lacdec);
+		o.rmempty = true;
+
+		o = s.option(form.ListValue, 'delay', _('Interval'), _('Poll interval data'));
+		o.value('', _('none'));
+		o.value('1', '1 '+_('sec'));
+		o.value('2', '2 '+_('sec'));
+		o.value('5', '5 '+_('sec'));
+		o.value('10', '10 '+_('sec'));
+		o.value('30', '30 '+_('sec'));
+
+		s = m.section(form.TypedSection, 'modeminfo', _('Devices setup'), null);
+		s.anonymous = true;
+		s.addremove = true;
+
+		o = s.option(form.Flag, 'qmi_mode', _('Use QMI'), qfdesc);
+		o.rmempty = true;
+		if (!qmiinfoInstalled) {
+			o.readonly = true;
+			o.write = function() {};
+			o.cfgvalue = function() { return '0'; };
+		}
+
+		o = s.option(form.ListValue, 'device', _('Data port'), sdesc);
+		o.load = function(section_id) {
+			return callSerialPort('/dev/').then(L.bind(function(devices) {
+				this.keylist = [];
+				this.vallist = [];
+				devices.reverse().forEach(device => this.value(device));
+				return form.Value.prototype.load.apply(this, [section_id]);
+			}, this));
+		};
+		o.placeholder = portplace;
+		o.rmempty = true;
+		o.depends('qmi_mode', '0');
+
+		o = s.option(form.ListValue, 'device_qmi', _('Data port'), qdesc);
+		o.load = function(section_id) {
+			return callQMIPort('/dev/').then(L.bind(function(devices) {
+				this.keylist = []; 
+				this.vallist = [];
+				for (var i = 0; i < devices.length; i++)
+					this.value(devices[i]);
+				return form.Value.prototype.load.apply(this, [section_id]);
+			}, this));
+		};
+		o.placeholder = portplace;
+		o.rmempty = true;
+		o.depends('qmi_mode', '1');
+
+		o = s.option(form.Flag, 'mmcli_name', _('Name via mmcli'), mmdesc);
+		o.rmempty = true;
+		o.depends('qmi_mode', '0');
+
+		o = s.option(form.ListValue, 'qmi_trap', _('QMI mode'), qmidesc);
+		o.value('',_('Auto'));
+		o.value('qmi',_('Direct QMI'));
+		o.value('mbim',_('QMI over MBIM'));
+		o.rmempty = true;
+		o.depends('qmi_mode', '1');
+
+		return m.render();
+	}	
+});

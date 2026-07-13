@@ -1,0 +1,66 @@
+#!/bin/sh /etc/rc.common
+#
+# Copyright (C) 2015 OpenWrt-dist
+# Copyright (C) 2016 fw867 <ffkykzs@gmail.com>
+# Copyright (C) 2025 LWB1978
+#
+# This is free software, licensed under the GNU General Public License v3.
+# See /LICENSE for more information.
+#
+
+START=99
+CONFIG=timewol
+CRONTAB_FILE="/etc/crontabs/root"
+ETHERWAKE_CMD="/usr/bin/etherwake"
+
+config_n_get() {
+	local ret=$(uci -q get "${CONFIG}.${1}.${2}" 2>/dev/null)
+	echo "${ret:=$3}"
+}
+
+is_true() {
+	case "$1" in
+		1|on|true|yes|enabled) return 0 ;;
+		*) return 1 ;;
+	esac
+}
+
+load_config() {
+	local enabled=$(config_n_get @basic[0] enable 0)
+	is_true "$enabled"
+}
+
+add_rule() {
+	sed -i '/etherwake/d' "$CRONTAB_FILE"
+
+	local ids=$(uci show $CONFIG | grep "=macclient" | awk -F '.' '{print $2}' | awk -F '=' '{print $1}')
+	[ -n "$ids" ] && {
+		for id in $ids; do
+			local enabled=$(config_n_get $id enable 0)
+			local macaddr=$(config_n_get $id macaddr)
+			local maceth=$(config_n_get $id maceth)
+			[ $enabled -eq 1 ] && [ -n "$macaddr" ] && [ -n "$maceth" ] && {
+				local minute=$(config_n_get $id minute "0")
+				local hour=$(config_n_get $id hour "*")
+				local day=$(config_n_get $id day "*")
+				local month=$(config_n_get $id month "*")
+				local weeks=$(config_n_get $id weeks "*")
+				echo "$minute $hour $day $month $weeks $ETHERWAKE_CMD -D -i $maceth $macaddr" >> "$CRONTAB_FILE"
+			}
+		done
+	}
+}
+
+start() {
+	if load_config; then
+		add_rule
+		/etc/init.d/cron restart
+	else
+		exit 0
+	fi
+}
+
+stop() {
+	sed -i '/etherwake/d' "$CRONTAB_FILE"
+	/etc/init.d/cron restart
+}

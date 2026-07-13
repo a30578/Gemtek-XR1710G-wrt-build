@@ -1,0 +1,50 @@
+<%#
+ Copyright 2016 Chen RuiWei <crwbak@gmail.com>
+ Copyright (C) 2025 LWB1978
+ Licensed to the public under the Apache License 2.0.
+-%>
+
+<% include("cbi/map") %>
+<script type="text/javascript">//<![CDATA[
+	XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "control", "timewol", "status")%>', null,
+		function(x, result)
+		{
+			var status = document.getElementsByClassName('timewol_status')[0];
+			status.setAttribute("style","font-weight:bold;");
+			status.setAttribute("color",result.status ? "green":"red");
+			status.innerHTML = result.status?'<%=translate("RUNNING")%>':'<%=translate("NOT RUNNING")%>';
+		}
+	)
+
+	function WakeUP(section) {
+		var input = document.querySelector("input[name='cbid.timewol." + section + ".remark']");
+		var remark = input ? input.value.trim() : "";
+		if (!confirm("<%:Are you sure you want to wake%> " + remark + " ?")) {
+			return;
+		}
+		fetch('<%=luci.dispatcher.build_url("admin", "control", "timewol", "wakeup")%>?section='
+			+ encodeURIComponent(section))
+		.then(response => response.json())
+		.then(data => {
+			if (!data.success) {
+				alert(data.msg || "Operation failed");
+			}
+		});
+	}
+//]]>
+</script>
+
+<style>
+
+input[id*=".timewol."][id$=".minute"],
+input[id*=".timewol."][id$=".hour"],
+input[id*=".timewol."][id$=".day"],
+input[id*=".timewol."][id$=".month"],
+input[id*=".timewol."][id$=".weeks"] {
+	width: 45px !important;
+	min-width: unset !important;
+	max-width: unset !important;
+	text-align: center !important;
+}
+
+</style>
