@@ -205,6 +205,11 @@ jobs:
           ls -la apps/custom/
 
           echo ""
+          echo "=== 推送前同步远程 ==="
+          git fetch origin
+          git rebase origin/main
+
+          echo ""
           echo "=== 检查 git status ==="
           git status
 
@@ -219,14 +224,7 @@ jobs:
             git push
             echo "✅ 已推送: apps/custom/$REPO_NAME"
           else
-            echo "检测到变化，正在提交..."
-            git config user.name "GitHub Actions"
-            git config user.email "actions@github.com"
-            git add -A apps/custom/
-            git status
-            git commit -m "add: $REPO_NAME plugins ($(date +%Y%m%d))"
-            git push
-            echo "✅ 已推送: apps/custom/$REPO_NAME"
+            echo "无需提交"
           fi
 
   clear-plugins:
@@ -260,6 +258,11 @@ jobs:
           echo ""
           echo "=== 剩余仓库 ==="
           ls -la apps/custom/ 2>/dev/null || echo "目录为空"
+
+          echo ""
+          echo "=== 推送前同步远程 ==="
+          git fetch origin
+          git rebase origin/main
 
           echo ""
           echo "=== 检查变化 ==="
