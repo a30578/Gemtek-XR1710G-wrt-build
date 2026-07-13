@@ -213,6 +213,7 @@ CONFIG_KERNEL_DEBUG_FS=y
 CONFIG_KERNEL_ARM_PMU=y
 CONFIG_KERNEL_ARM_PMUV3=y
 CONFIG_KERNEL_PERF_EVENTS=y
+CONFIG_KERNEL_ARM64_BRBE=y
 # CONFIG_KERNEL_PROFILING is not set
 # CONFIG_KERNEL_UBSAN is not set
 # CONFIG_KERNEL_KASAN is not set
@@ -467,7 +468,7 @@ CONFIG_USE_MUSL=y
 CONFIG_SSP_SUPPORT=y
 CONFIG_BINUTILS_VERSION_2_46=y
 CONFIG_BINUTILS_VERSION="2.46.1"
-CONFIG_GCC_VERSION="14.3.0"
+CONFIG_GCC_VERSION="14.4.0"
 CONFIG_GCC_USE_DEFAULT_VERSION=y
 CONFIG_LIBC="musl"
 CONFIG_TARGET_SUFFIX="musl"
@@ -505,6 +506,7 @@ CONFIG_FEED_packages=y
 CONFIG_FEED_luci=y
 CONFIG_FEED_routing=y
 CONFIG_FEED_telephony=y
+CONFIG_FEED_video=y
 
 #
 # Base system
@@ -1888,8 +1890,9 @@ CONFIG_WIFI_SCRIPTS_UCODE=y
 # Boot Loaders
 #
 # CONFIG_PACKAGE_u-boot-an7581_gemtek_w1700k is not set
+# CONFIG_PACKAGE_u-boot-an7581_gemtek_xg2010g is not set
+CONFIG_PACKAGE_u-boot-an7581_gemtek_xr1710g=y
 # CONFIG_PACKAGE_u-boot-an7581_nokia_valyrian is not set
-# CONFIG_PACKAGE_u-boot-an7581_nokia_xg-040g-md is not set
 # CONFIG_PACKAGE_u-boot-an7581_rfb is not set
 # end of Boot Loaders
 
@@ -2157,9 +2160,8 @@ CONFIG_PACKAGE_airoha-en7581-mt7996-npu-firmware=y
 # CONFIG_PACKAGE_rtl8192du-firmware is not set
 # CONFIG_PACKAGE_rtl8192eu-firmware is not set
 # CONFIG_PACKAGE_rtl8192se-firmware is not set
-CONFIG_PACKAGE_rtl8261n-firmware=y
-# CONFIG_PACKAGE_rtl8261n-lp-firmware is not set
-# CONFIG_PACKAGE_rtl8264b-firmware is not set
+# CONFIG_PACKAGE_rtl826x-firmware is not set
+# CONFIG_PACKAGE_rtl826x-lp-firmware is not set
 # CONFIG_PACKAGE_rtl8723au-firmware is not set
 # CONFIG_PACKAGE_rtl8723be-firmware is not set
 # CONFIG_PACKAGE_rtl8723bu-firmware is not set
@@ -2218,6 +2220,14 @@ CONFIG_PACKAGE_wireless-regdb=y
 # CONFIG_PACKAGE_dejavu-fonts-ttf-DejaVuSerifCondensed-Italic is not set
 # end of DejaVu
 # end of Fonts
+
+#
+# Games
+#
+# CONFIG_PACKAGE_gzdoom is not set
+# CONFIG_PACKAGE_sdl3-doom is not set
+# CONFIG_PACKAGE_vice is not set
+# end of Games
 
 #
 # Kernel modules
@@ -2571,6 +2581,7 @@ CONFIG_PACKAGE_kmod-lib-crc-ccitt=y
 # Multiplexer Support
 #
 # CONFIG_PACKAGE_kmod-mux-core is not set
+# CONFIG_PACKAGE_kmod-mux-mmio is not set
 # end of Multiplexer Support
 
 #
@@ -4640,6 +4651,11 @@ CONFIG_WOLFSSL_ALT_NAMES=y
 #
 # Video
 #
+# CONFIG_PACKAGE_fribidi is not set
+# CONFIG_PACKAGE_harfbuzz is not set
+# CONFIG_PACKAGE_libassimp is not set
+# CONFIG_PACKAGE_libcairo is not set
+# CONFIG_PACKAGE_libdisplay-info is not set
 # CONFIG_PACKAGE_libdrm is not set
 # CONFIG_PACKAGE_libdrm-amdgpu is not set
 # CONFIG_PACKAGE_libdrm-etnaviv is not set
@@ -4647,6 +4663,34 @@ CONFIG_WOLFSSL_ALT_NAMES=y
 # CONFIG_PACKAGE_libdrm-omap is not set
 # CONFIG_PACKAGE_libdrm-radeon is not set
 # CONFIG_PACKAGE_libdrm-tegra is not set
+# CONFIG_PACKAGE_libepoxy is not set
+# CONFIG_PACKAGE_libglm is not set
+# CONFIG_PACKAGE_libgraphene is not set
+# CONFIG_PACKAGE_libmesa-amd is not set
+# CONFIG_PACKAGE_libmesa-etnaviv is not set
+# CONFIG_PACKAGE_libmesa-lima is not set
+# CONFIG_PACKAGE_libmesa-llvmpipe is not set
+# CONFIG_PACKAGE_libmesa-nouveau is not set
+# CONFIG_PACKAGE_libmesa-panfrost is not set
+# CONFIG_PACKAGE_libmesa-softpipe is not set
+# CONFIG_PACKAGE_libmesa-tegra is not set
+# CONFIG_PACKAGE_libmesa-virgl is not set
+# CONFIG_PACKAGE_libmesa-zink is not set
+# CONFIG_PACKAGE_libpango is not set
+# CONFIG_PACKAGE_libseat is not set
+# CONFIG_PACKAGE_libteflon-etnaviv is not set
+# CONFIG_PACKAGE_libteflon-rocket is not set
+# CONFIG_PACKAGE_libva is not set
+# CONFIG_PACKAGE_libvulkan-imagination is not set
+# CONFIG_PACKAGE_libvulkan-lvp is not set
+# CONFIG_PACKAGE_libvulkan-panfrost is not set
+# CONFIG_PACKAGE_libvulkan-radeon is not set
+# CONFIG_PACKAGE_libvulkan-virtio is not set
+CONFIG_HAVE_MESA=y
+CONFIG_MESA_USE_LLVM=y
+# CONFIG_PACKAGE_seatd is not set
+# CONFIG_PACKAGE_vulkan-loader is not set
+# CONFIG_PACKAGE_wayland-info is not set
 # end of Video
 
 #
@@ -4675,6 +4719,7 @@ CONFIG_WOLFSSL_ALT_NAMES=y
 # CONFIG_PACKAGE_cJSON is not set
 # CONFIG_PACKAGE_ccid is not set
 # CONFIG_PACKAGE_check is not set
+# CONFIG_PACKAGE_cog is not set
 # CONFIG_PACKAGE_confuse is not set
 # CONFIG_PACKAGE_czmq is not set
 # CONFIG_PACKAGE_davici is not set
@@ -4689,6 +4734,7 @@ CONFIG_WOLFSSL_ALT_NAMES=y
 # CONFIG_PACKAGE_glib2-gmodule is not set
 # CONFIG_PACKAGE_glib2-gobject is not set
 # CONFIG_PACKAGE_glib2-gthread is not set
+# CONFIG_PACKAGE_glslang is not set
 # CONFIG_PACKAGE_gnulib-l10n is not set
 # CONFIG_PACKAGE_google-authenticator-libpam is not set
 # CONFIG_PACKAGE_gperftools is not set
@@ -4735,8 +4781,11 @@ CONFIG_PACKAGE_libcap-ng=y
 # CONFIG_PACKAGE_libcbor is not set
 # CONFIG_PACKAGE_libcgroup is not set
 # CONFIG_PACKAGE_libcharset is not set
+# CONFIG_PACKAGE_libclang is not set
+# CONFIG_PACKAGE_libclang-cpp is not set
 # CONFIG_PACKAGE_libcli is not set
 # CONFIG_PACKAGE_libcoap is not set
+# CONFIG_PACKAGE_libcogcore is not set
 # CONFIG_PACKAGE_libcomerr is not set
 # CONFIG_PACKAGE_libconfig is not set
 # CONFIG_PACKAGE_libcron is not set
@@ -4892,6 +4941,7 @@ CONFIG_PACKAGE_libjson-c=y
 # CONFIG_PACKAGE_libleptonica is not set
 # CONFIG_PACKAGE_libloragw is not set
 CONFIG_PACKAGE_libltdl=y
+# CONFIG_PACKAGE_liblto is not set
 CONFIG_PACKAGE_liblua=y
 # CONFIG_PACKAGE_liblua5.3 is not set
 CONFIG_PACKAGE_liblua5.4=y
@@ -5004,6 +5054,7 @@ CONFIG_PCRE2_JIT_ENABLED=y
 # CONFIG_PACKAGE_libradcli is not set
 # CONFIG_PACKAGE_libradiotap is not set
 CONFIG_PACKAGE_libreadline=y
+# CONFIG_PACKAGE_libremarks is not set
 # CONFIG_PACKAGE_librhash is not set
 # CONFIG_PACKAGE_librouteros is not set
 # CONFIG_PACKAGE_libroxml is not set
@@ -5015,6 +5066,12 @@ CONFIG_PACKAGE_libruby=y
 # CONFIG_PACKAGE_libsasl2 is not set
 # CONFIG_PACKAGE_libsasl2-sasldb is not set
 # CONFIG_PACKAGE_libsasl2-utils is not set
+# CONFIG_PACKAGE_libsdl2-compat is not set
+# CONFIG_PACKAGE_libsdl2-image is not set
+# CONFIG_PACKAGE_libsdl2-mixer is not set
+# CONFIG_PACKAGE_libsdl3 is not set
+# CONFIG_PACKAGE_libsdl3-image is not set
+# CONFIG_PACKAGE_libsdl3-mixer is not set
 # CONFIG_PACKAGE_libseccomp is not set
 # CONFIG_PACKAGE_libselinux is not set
 # CONFIG_PACKAGE_libsemanage is not set
@@ -5096,11 +5153,14 @@ CONFIG_PACKAGE_libuv=y
 CONFIG_PACKAGE_libwebsockets-full=y
 # CONFIG_PACKAGE_libwebsockets-mbedtls is not set
 # CONFIG_PACKAGE_libwebsockets-openssl is not set
+# CONFIG_PACKAGE_libwpe is not set
+# CONFIG_PACKAGE_libwpewebkit is not set
 # CONFIG_PACKAGE_libwrap is not set
 # CONFIG_PACKAGE_libwxbase is not set
 # CONFIG_PACKAGE_libxdp is not set
 # CONFIG_PACKAGE_libxerces-c is not set
 # CONFIG_PACKAGE_libxerces-c-samples is not set
+# CONFIG_PACKAGE_libxkbcommon is not set
 # CONFIG_PACKAGE_libxml2 is not set
 # CONFIG_PACKAGE_libxmlb is not set
 # CONFIG_PACKAGE_libxslt is not set
@@ -5110,6 +5170,7 @@ CONFIG_PACKAGE_libwebsockets-full=y
 # CONFIG_PACKAGE_libyder is not set
 # CONFIG_PACKAGE_libzmq-curve is not set
 # CONFIG_PACKAGE_libzmq-nc is not set
+# CONFIG_PACKAGE_libzmusic is not set
 # CONFIG_PACKAGE_linux-atm is not set
 # CONFIG_PACKAGE_lmdb is not set
 # CONFIG_PACKAGE_log4cplus is not set
@@ -5147,6 +5208,10 @@ CONFIG_PACKAGE_terminfo=y
 # CONFIG_PACKAGE_tinycdb is not set
 # CONFIG_PACKAGE_totem-pl-parser is not set
 # CONFIG_PACKAGE_vectorscan is not set
+# CONFIG_PACKAGE_wpebackend-fdo is not set
+# CONFIG_PACKAGE_wpewebkit-driver is not set
+# CONFIG_PACKAGE_wpewebkit-minibrowser is not set
+# CONFIG_PACKAGE_xkeyboard-config is not set
 # CONFIG_PACKAGE_xmlrpc-c-abyss is not set
 # CONFIG_PACKAGE_xmlrpc-c-client is not set
 # CONFIG_PACKAGE_xmlrpc-c-libxml2 is not set
@@ -5289,7 +5354,7 @@ CONFIG_PACKAGE_luci-app-banip=y
 # CONFIG_PACKAGE_luci-app-dawn is not set
 # CONFIG_PACKAGE_luci-app-dcwapd is not set
 CONFIG_PACKAGE_luci-app-ddns=y
-CONFIG_PACKAGE_luci-app-ddns-go=y
+# CONFIG_PACKAGE_luci-app-ddns-go is not set
 # CONFIG_PACKAGE_luci-app-diskman is not set
 # CONFIG_PACKAGE_luci-app-docker is not set
 # CONFIG_PACKAGE_luci-app-dockerman is not set
@@ -5390,7 +5455,7 @@ CONFIG_PACKAGE_luci-app-rtp2httpd=y
 # CONFIG_PACKAGE_luci-app-samba4 is not set
 # CONFIG_PACKAGE_luci-app-scutclient is not set
 # CONFIG_PACKAGE_luci-app-ser2net is not set
-CONFIG_PACKAGE_luci-app-smartdns=y
+# CONFIG_PACKAGE_luci-app-smartdns is not set
 CONFIG_PACKAGE_luci-app-smartdns_INCLUDE_WebUI=y
 # CONFIG_PACKAGE_luci-app-sms-tool-js is not set
 # CONFIG_PACKAGE_luci-app-snmpd is not set
@@ -5433,13 +5498,13 @@ CONFIG_PACKAGE_luci-app-wol=y
 # CONFIG_PACKAGE_luci-app-xfrpc is not set
 # CONFIG_PACKAGE_luci-app-xinetd is not set
 # CONFIG_PACKAGE_luci-app-xlnetacc is not set
-CONFIG_PACKAGE_luci-app-zerotier=y
+# CONFIG_PACKAGE_luci-app-zerotier is not set
 # end of 3. Applications
 
 #
 # 4. Themes
 #
-# CONFIG_PACKAGE_luci-theme-argon is not set
+CONFIG_PACKAGE_luci-theme-argon=y
 CONFIG_PACKAGE_luci-theme-bootstrap=y
 # CONFIG_PACKAGE_luci-theme-material is not set
 # CONFIG_PACKAGE_luci-theme-openwrt is not set
@@ -5606,8 +5671,6 @@ CONFIG_PACKAGE_luci-i18n-base-zh-cn=y
 # CONFIG_PACKAGE_luci-i18n-ddns-fi is not set
 # CONFIG_PACKAGE_luci-i18n-ddns-fr is not set
 # CONFIG_PACKAGE_luci-i18n-ddns-ga is not set
-CONFIG_PACKAGE_luci-i18n-ddns-go-zh-cn=y
-# CONFIG_PACKAGE_luci-i18n-ddns-go-zh-tw is not set
 # CONFIG_PACKAGE_luci-i18n-ddns-he is not set
 # CONFIG_PACKAGE_luci-i18n-ddns-hi is not set
 # CONFIG_PACKAGE_luci-i18n-ddns-hu is not set
@@ -5716,43 +5779,6 @@ CONFIG_PACKAGE_luci-i18n-package-manager-zh-cn=y
 # CONFIG_PACKAGE_luci-i18n-package-manager-zh-tw is not set
 CONFIG_PACKAGE_luci-i18n-passwall-zh-cn=y
 CONFIG_PACKAGE_luci-i18n-rtp2httpd-zh-cn=y
-# CONFIG_PACKAGE_luci-i18n-smartdns-ar is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-bg is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-bn is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-ca is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-cs is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-da is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-de is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-el is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-es is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-fi is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-fr is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-ga is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-he is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-hi is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-hu is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-it is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-ja is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-ko is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-lo is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-lt is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-mr is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-ms is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-nl is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-no is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-pl is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-pt is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-pt-br is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-ro is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-ru is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-sk is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-sv is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-ta is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-tr is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-uk is not set
-# CONFIG_PACKAGE_luci-i18n-smartdns-vi is not set
-CONFIG_PACKAGE_luci-i18n-smartdns-zh-cn=y
-# CONFIG_PACKAGE_luci-i18n-smartdns-zh-tw is not set
 # CONFIG_PACKAGE_luci-i18n-ttyd-ar is not set
 # CONFIG_PACKAGE_luci-i18n-ttyd-bg is not set
 # CONFIG_PACKAGE_luci-i18n-ttyd-bn is not set
@@ -6007,8 +6033,6 @@ CONFIG_PACKAGE_luci-i18n-wifischedule-zh-cn=y
 # CONFIG_PACKAGE_luci-i18n-wol-yua is not set
 CONFIG_PACKAGE_luci-i18n-wol-zh-cn=y
 # CONFIG_PACKAGE_luci-i18n-wol-zh-tw is not set
-CONFIG_PACKAGE_luci-i18n-zerotier-zh-cn=y
-# CONFIG_PACKAGE_luci-i18n-zerotier-zh-tw is not set
 # end of LuCI
 
 #
@@ -7454,7 +7478,7 @@ CONFIG_PACKAGE_unzip=y
 # CONFIG_PACKAGE_jupp is not set
 # CONFIG_PACKAGE_mg is not set
 # CONFIG_PACKAGE_micro is not set
-# CONFIG_PACKAGE_nano is not set
+CONFIG_PACKAGE_nano=y
 # CONFIG_PACKAGE_nano-full is not set
 # CONFIG_PACKAGE_nano-plus is not set
 # CONFIG_PACKAGE_vim is not set
@@ -7655,7 +7679,13 @@ CONFIG_PACKAGE_ttyd=y
 #
 # Video
 #
+# CONFIG_PACKAGE_kmscube is not set
 # CONFIG_PACKAGE_libdrm-tests is not set
+# CONFIG_PACKAGE_libgtk-demos is not set
+# CONFIG_PACKAGE_libgtk-utils is not set
+# CONFIG_PACKAGE_libsdl3-tests is not set
+# CONFIG_PACKAGE_vkmark is not set
+# CONFIG_PACKAGE_vulkaninfo is not set
 # end of Video
 
 #
@@ -8226,6 +8256,7 @@ CONFIG_PACKAGE_watchcat=y
 # CONFIG_PACKAGE_whois is not set
 # CONFIG_PACKAGE_wifitoggle is not set
 # CONFIG_PACKAGE_wipe is not set
+# CONFIG_PACKAGE_xa is not set
 # CONFIG_PACKAGE_xdg-dbus-proxy is not set
 # CONFIG_PACKAGE_xsltproc is not set
 # CONFIG_PACKAGE_xxd is not set
@@ -8236,6 +8267,76 @@ CONFIG_PACKAGE_watchcat=y
 # CONFIG_PACKAGE_yq is not set
 # CONFIG_PACKAGE_zyxel-reset is not set
 # end of Utilities
+
+#
+# Video
+#
+
+#
+# Frameworks and Toolkits
+#
+# CONFIG_PACKAGE_cage is not set
+# CONFIG_PACKAGE_libgdk-pixbuf is not set
+# CONFIG_PACKAGE_libgtk is not set
+# CONFIG_PACKAGE_libwayland is not set
+# CONFIG_PACKAGE_qt5base-concurrent is not set
+# CONFIG_PACKAGE_qt5base-core is not set
+# CONFIG_PACKAGE_qt5base-examples is not set
+# CONFIG_PACKAGE_qt5base-gui is not set
+# CONFIG_PACKAGE_qt5base-network is not set
+# CONFIG_PACKAGE_qt5base-plugin-bearer-generic is not set
+# CONFIG_PACKAGE_qt5base-plugin-imageformats-ico is not set
+# CONFIG_PACKAGE_qt5base-plugin-imageformats-jpeg is not set
+# CONFIG_PACKAGE_qt5base-plugin-input-evdevkeyboard is not set
+# CONFIG_PACKAGE_qt5base-plugin-input-evdevmouse is not set
+# CONFIG_PACKAGE_qt5base-plugin-input-evdevtablet is not set
+# CONFIG_PACKAGE_qt5base-plugin-input-evdevtouch is not set
+# CONFIG_PACKAGE_qt5base-plugin-input-libinput is not set
+# CONFIG_PACKAGE_qt5base-plugin-platforms-eglfs is not set
+# CONFIG_PACKAGE_qt5base-plugin-platforms-linuxfb is not set
+# CONFIG_PACKAGE_qt5base-plugin-platforms-minimal is not set
+# CONFIG_PACKAGE_qt5base-plugin-platforms-minimalegl is not set
+# CONFIG_PACKAGE_qt5base-plugin-platforms-offscreen is not set
+# CONFIG_PACKAGE_qt5base-plugin-platforms-vnc is not set
+# CONFIG_PACKAGE_qt5base-printSupport is not set
+# CONFIG_PACKAGE_qt5base-sql is not set
+# CONFIG_PACKAGE_qt5base-test is not set
+# CONFIG_PACKAGE_qt5base-widgets is not set
+# CONFIG_PACKAGE_qt5base-xml is not set
+# CONFIG_PACKAGE_qt5quick-controls2 is not set
+# CONFIG_PACKAGE_qt5quick-qml is not set
+# CONFIG_PACKAGE_qt5quick-qml-models is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtlabs-animation is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtlabs-folderlistmodel is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtlabs-models is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtlabs-settings is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtlabs-sharedimage is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtlabs-wavefrontmesh is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtqml-models2 is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtqml-statemachine is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtqml-workerscript2 is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtquick is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtquick-layouts is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtquick-localstorage is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtquick-shapes is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qtquick-window2 is not set
+# CONFIG_PACKAGE_qt5quick-qml-module-qttest is not set
+# CONFIG_PACKAGE_qt5quick-qml-worker-script is not set
+# CONFIG_PACKAGE_qt5quick-quick is not set
+# CONFIG_PACKAGE_qt5quick-quick-shapes is not set
+# CONFIG_PACKAGE_qt5quick-quick-test is not set
+# CONFIG_PACKAGE_qt5quick-quick-widgets is not set
+# CONFIG_PACKAGE_qt5script-script is not set
+# CONFIG_PACKAGE_qt5script-scriptTools is not set
+# CONFIG_PACKAGE_qt5svg is not set
+# CONFIG_PACKAGE_qt5translations is not set
+# CONFIG_PACKAGE_qt5virtualkeyboard is not set
+# CONFIG_PACKAGE_wayland-protocols is not set
+# CONFIG_PACKAGE_wayland-scanner is not set
+# CONFIG_PACKAGE_weston is not set
+# CONFIG_PACKAGE_wlroots is not set
+# end of Frameworks and Toolkits
+# end of Video
 
 #
 # Xorg
