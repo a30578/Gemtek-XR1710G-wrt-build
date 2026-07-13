@@ -32,6 +32,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 600
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -365,19 +367,15 @@ jobs:
           name: XR1710G-Firmware-${{ inputs.upstream }}
           path: artifacts/*
 
-      - name: Generate Release Timestamp
-        id: timestamp
-        if: success()
-        run: echo "value=$(date +%Y%m%d-%H%M)" >> $GITHUB_OUTPUT
-
       - name: Create Release
         if: success()
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ inputs.upstream }}-${{ steps.timestamp.outputs.value }}
-          name: ${{ inputs.upstream }} Build ${{ steps.timestamp.outputs.value }}
+          tag_name: ${{ inputs.upstream }}
+          name: ${{ inputs.upstream }} Build
           files: artifacts/*
           draft: false
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
