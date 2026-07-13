@@ -52,11 +52,11 @@ jobs:
               echo "repo=https://github.com/istoreos/istoreos.git" >> $GITHUB_OUTPUT
               ;;
             immortalwrt)
-              echo "branch=openwrt-25.12" >> $GITHUB_OUTPUT
+              echo "branch=master" >> $GITHUB_OUTPUT
               echo "repo=https://github.com/immortalwrt/immortalwrt.git" >> $GITHUB_OUTPUT
               ;;
             openwrt)
-              echo "branch=openwrt-25.12" >> $GITHUB_OUTPUT
+              echo "branch=main" >> $GITHUB_OUTPUT
               echo "repo=https://github.com/openwrt/openwrt.git" >> $GITHUB_OUTPUT
               ;;
           esac
