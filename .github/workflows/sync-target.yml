@@ -114,20 +114,15 @@ jobs:
         if: github.event.inputs.action == 'sync'
         run: |
           echo "=== Git 状态 ==="
-          CHANGES=$(git status --porcelain | grep -E "target/linux/|package/boot/uboot-airoha/" || true)
+          git status --porcelain | grep -E "target/linux/|package/boot/uboot-airoha/" || true
 
-          if [ -z "$CHANGES" ]; then
-            echo "没有变化，无需提交"
-          else
-            echo "$CHANGES"
-            echo ""
-            echo "检测到变化，正在提交..."
-            git config user.name "GitHub Actions"
-            git config user.email "actions@github.com"
-            git add target/linux/airoha/ package/boot/uboot-airoha/
-            git commit -m "sync: target + uboot-airoha from lvcdy/openwrt_xr1710g ($(date +%Y%m%d))"
-            git push
-            echo "✅ 已推送"
-          fi
+          echo ""
+          echo "检测到变化，正在提交..."
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add target/linux/airoha/ package/boot/uboot-airoha/
+          git commit -m "sync: target + uboot-airoha from lvcdy/openwrt_xr1710g ($(date +%Y%m%d))" || echo "无需提交"
+          git push || echo "推送失败"
+          echo "✅ 已处理"
 
           rm -rf tmp-xr1710g-source
