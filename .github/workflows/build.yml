@@ -365,7 +365,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: XR1710G-Firmware-${{ inputs.upstream }}
-          path: artifacts/**/*
+          path: artifacts/*
 
       - name: Get Current Date
         id: date
@@ -378,7 +378,9 @@ jobs:
         with:
           tag_name: ${{ steps.date.outputs.date }}-${{ inputs.upstream }}
           name: ${{ steps.date.outputs.date }}-${{ inputs.upstream }} Build
-          files: artifacts/*
+          files: |
+            artifacts/*initramfs.itb
+            artifacts/*sysupgrade.itb
           draft: false
           generate_release_notes: true
         env:
