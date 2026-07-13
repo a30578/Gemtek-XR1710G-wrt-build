@@ -13,6 +13,9 @@ on:
           - sync
           - diff
 
+permissions:
+  contents: write
+
 jobs:
   sync-target:
     runs-on: ubuntu-latest
