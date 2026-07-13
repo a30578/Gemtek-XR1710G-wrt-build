@@ -365,12 +365,17 @@ jobs:
           name: XR1710G-Firmware-${{ inputs.upstream }}
           path: artifacts/*
 
+      - name: Generate Release Timestamp
+        id: timestamp
+        if: success()
+        run: echo "value=$(date +%Y%m%d-%H%M)" >> $GITHUB_OUTPUT
+
       - name: Create Release
         if: success()
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ inputs.upstream }}-$(date +%Y%m%d-%H%M)
-          name: ${{ inputs.upstream }} Build $(date +%Y%m%d-%H%M)
+          tag_name: ${{ inputs.upstream }}-${{ steps.timestamp.outputs.value }}
+          name: ${{ inputs.upstream }} Build ${{ steps.timestamp.outputs.value }}
           files: artifacts/*
           draft: false
         env:
