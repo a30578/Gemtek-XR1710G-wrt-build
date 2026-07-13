@@ -1,315 +1,225 @@
 # 编译配置说明
 
-本目录包含编译配置文件，用于自定义 Gemtek XR1710G 固件。
+本目录包含编译 XR1710G 固件所需的所有配置文件。修改配置后重新运行 Build Firmware 即可生效。
 
 ---
 
-## 文件清单
+## 文件总览
 
-| 文件 | 说明 | 执行时机 |
-|------|------|---------|
-| `plugins.conf` | LuCI 插件选择配置 | 编辑后生效 |
-| `diy-part1.sh` | 编译前自定义脚本 Part 1 | `feeds install` 之后 |
-| `diy-part2.sh` | 编译前自定义脚本 Part 2 | `make menuconfig` 之后 |
-
----
-
-## ⚡ Workflow 动态配置
-
-GitHub Actions 触发编译时，以下配置由 workflow **自动覆盖**：
-
-| 配置项 | 来源 | 说明 |
-|--------|------|------|
-| `UPSTREAM` | workflow 选择 | `immortalwrt` 或 `openwrt` |
-| `hostname` | workflow 选择 | 根据版本自动设置 (ImmortalWrt-XR1710G / OpenWrt-XR1710G) |
-| `LAN IP` | workflow 输入 | 用户自定义，默认 `192.168.100.1` |
-| 固件大小 | menuconfig | **自动计算**，无需手动设置 |
-
-### 关于固件大小
-
-🔴 **重要：** `CONFIG_TARGET_ROOTFS_SIZE` 仅适用于 **x86 架构 ext4 镜像**，对 NAND 设备无效。
-
-XR1710G 使用 **SPI-NAND Flash (4GB)**：
-
-| 分区 | 大小 | 说明 |
-|------|------|------|
-| bootloader | ~1MB | 引导程序 |
-| uboot | ~2MB | U-Boot |
-| firmware (kernel + rootfs) | ~3500MB | 系统分区 |
-| overlay (可用) | ~3.5GB | 用户数据 |
-
-**固件大小由 `make menuconfig` 根据设备配置自动计算**，无需手动指定。
-
-### 覆盖原理
-
-```
-workflow inputs (upstream, lan_ip)
-     ↓
-Create Default Config 步骤
-     ↓
-读取 docs/system-default → 替换 hostname
-读取 docs/network-default → 替换 LAN IP
-     ↓
-Apply Plugin Configuration 步骤
-     ↓
-读取 plugins.conf → 移除旧值 → 追加动态值
-     ↓
-生成临时文件 → 注入到 .config
-```
-
-### 触发方式
-
-在 Actions 页面选择：
-1. `upstream`: immortalwrt / openwrt
-2. `lan_ip`: 自定义 LAN IP 地址 (默认: 192.168.100.1)
-3. 点击运行
-
----
-
-## ⚠️ 本地编译注意
-
-本地编译时，这些值**不会被自动覆盖**，需要在对应文件中手动设置：
-
-- `docs/system-default` - 修改 `option hostname` 值
-- `docs/network-default` - 修改 `option ipaddr` 值
-- `config/plugins.conf` - 修改 `UPSTREAM` 值
-
----
-
-## plugins.conf - 插件配置
-
-编辑此文件启用/禁用插件，采用 `CONFIG_PACKAGE_xxx=y` 格式。
-
-### 插件分类
-
-```bash
-# --- 基础服务 ---
-CONFIG_PACKAGE_luci-app-uhttpd=y    # Web服务器
-CONFIG_PACKAGE_luci-app-ucode=y     # UCode 区间
-
-# --- 广告拦截 ---
-CONFIG_PACKAGE_luci-app-adguardhome=y    # AdGuard Home (推荐)
-
-# --- 代理插件 (三选一或组合) ---
-CONFIG_PACKAGE_luci-app-openclash=y     # OpenClash (推荐)
-# CONFIG_PACKAGE_luci-app-passwall=y    # PassWall
-# CONFIG_PACKAGE_luci-app-dae=y         # dae
-
-# --- 下载工具 ---
-# CONFIG_PACKAGE_luci-app-qbittorrent=y     # qBittorrent
-# CONFIG_PACKAGE_luci-app-aria2=y          # Aria2
-
-# --- 管理工具 ---
-CONFIG_PACKAGE_luci-app-ttyd=y           # Web终端
-CONFIG_PACKAGE_luci-app-diskman=y        # 磁盘管理
-CONFIG_PACKAGE_luci-app-filebrowser=y    # 文件管理
-
-# --- 系统工具 ---
-CONFIG_PACKAGE_luci-app-autoreboot=y     # 定时重启
-CONFIG_PACKAGE_luci-app-firewall=y       # 防火墙
-CONFIG_PACKAGE_luci-app-nlbwmon=y        # 流量监控
-
-# --- VPN ---
-CONFIG_PACKAGE_luci-app-wireguard=y      # WireGuard VPN
-```
-
----
-
-## diy-part1.sh - 编译前配置 (Part 1)
-
-**执行时机：** `./scripts/feeds install -a` 之后、`make` 之前
-
-### 配置内容
-
-```bash
-# 网络功能
-CONFIG_PACKAGE_luci-proto-ipv6=y       # IPv6 支持
-CONFIG_PACKAGE_kmod-tcp-bbr=y          # BBR 拥塞控制
-CONFIG_PACKAGE_luci-app-qos=y          # QoS 流量控制
-
-# 流量卸载优化
-CONFIG_PACKAGE_kmod-nf-flow=y          # 连接跟踪加速
-CONFIG_PACKAGE_kmod-ipt-offload=y      # iptables offload
-CONFIG_PACKAGE_kmod-nft-offload=y      # nftables offload
-
-# NPU 硬件加速
-CONFIG_PACKAGE_kmod-airoha-npu=y       # Airoha NPU 驱动
-
-# WiFi 7 (MT7996) + MLO
-CONFIG_PACKAGE_kmod-mt7996e=y           # WiFi 7 驱动
-CONFIG_PACKAGE_kmod-mt7921e=y           # WiFi 6 驱动
-CONFIG_PACKAGE_wpad-openssl=y           # WPA3 支持
-
-# 10G 万兆网口
-CONFIG_PACKAGE_kmod-phy-airoha=y       # Airoha PHY 驱动
-CONFIG_PACKAGE_kmod-gsw-airoha=y       # Airoha 交换机驱动
-
-# DSCP QoS
-CONFIG_PACKAGE_kmod-ipt-dscp=y         # DSCP 标记
-
-# 系统优化
-CONFIG_PACKAGE_luci-app-openssh=y      # OpenSSH
-CONFIG_TIME_ZONE="CST-8"               # 时区
-```
-
-### 配置说明
-
-| 类别 | 功能 | 说明 |
-|------|------|------|
-| 网络 | IPv6, BBR, QoS | 基础网络功能 |
-| 加速 | Flow-offload, NPU | 硬件加速 |
-| 无线 | WiFi 7 + MLO | 三频 2.4G/5G/6G |
-| 以太网 | 10G 万兆 | Airoha 以太网驱动 |
-| QoS | DSCP offload | 流量优先级 |
-| 系统 | OpenSSH, 时区 | 基础配置 |
-
----
-
-## diy-part2.sh - 编译前配置 (Part 2)
-
-**执行时机：** `make menuconfig` 之后、`make` 之前
-
-### 配置内容
-
-```bash
-# 风扇/温度监控 (NCT7802 传感器)
-CONFIG_PACKAGE_kmod-nct7802=y          # XR1710G 主板传感器
-
-# WiFi 7 工具
-CONFIG_PACKAGE_kmod-mt7996e=y           # WiFi 7 驱动
-CONFIG_PACKAGE_kmod-mt7921e=y           # WiFi 6 驱动
-CONFIG_PACKAGE_iw=y                     # 无线配置工具
-CONFIG_PACKAGE_iwinfo=y                 # 无线信息工具
-
-# 以太网工具
-CONFIG_PACKAGE_kmod-airoha-enet-phy=y   # Airoha PHY
-CONFIG_PACKAGE_kmod-phylib=y            # PHY 库
-CONFIG_PACKAGE_kmod-phylink=y           # PHY 链路
-
-# QoS/nftables
-CONFIG_PACKAGE_nft-qos=y                # nftables QoS
-CONFIG_PACKAGE_luci-app-nft-qos=y       # LuCI nftables QoS
-
-# 文件系统
-CONFIG_PACKAGE_block-mount=y            # 自动挂载
-CONFIG_PACKAGE_kmod-fs-ext4=y           # ext4 支持
-CONFIG_PACKAGE_kmod-fs-vfat=y           # FAT32 支持
-CONFIG_PACKAGE_kmod-fs-ntfs=y           # NTFS 支持
-CONFIG_PACKAGE_kmod-fs-exfat=y          # exFAT 支持
-
-# NAND/SPI-NAND
-CONFIG_PACKAGE_kmod-mtd=y               # MTD 子系统
-CONFIG_PACKAGE_kmod-mtd-rw=y            # MTD 读写
-CONFIG_PACKAGE_mtd-utils=y              # MTD 工具
-
-# 网络监控
-CONFIG_PACKAGE_luci-app-nlbwmon=y       # 流量监控
-```
-
-### 配置说明
-
-| 类别 | 功能 | 说明 |
-|------|------|------|
-| 风扇控制 | NCT7802 | 温度监控 + 自动调速 |
-| 无线 | MT7996/MT7921 | WiFi 7 驱动和工具 |
-| 以太网 | Airoha PHY | 万兆网口支持 |
-| QoS | nftables | 流量控制 |
-| 存储 | 多文件系统 | 磁盘挂载支持 |
-| NAND | MTD | SPI-NAND 闪存支持 |
-
----
-
-## 网络配置 (docs/network-default)
-
-自定义 LAN IP 地址，默认 `192.168.100.1`：
-
-```bash
-config interface 'lan'
-    option proto 'static'
-    option ipaddr '__LAN_IP__'      # 替换为自定义 IP
-    option netmask '255.255.255.0'
-```
-
----
-
-## 执行顺序
-
-```
-┌─────────────────────────────────────────────────────────┐
-│ 1. ./scripts/feeds update -a                           │
-│ 2. ./scripts/feeds install -a                          │
-│            ↓                                            │
-│ 3. [运行 diy-part1.sh] ←── 第一阶段自定义配置           │
-│            ↓                                            │
-│ 4. make defconfig / make menuconfig                    │
-│            ↓                                            │
-│ 5. [运行 diy-part2.sh] ←── 第二阶段自定义配置           │
-│            ↓                                            │
-│ 6. make -j$(nproc)                                     │
-└─────────────────────────────────────────────────────────┘
-```
-
----
-
-## 设备配置 (menuconfig)
-
-在 `make menuconfig` 中选择：
-
-```
-Target System: Airoha ARM64
-Subtarget: AN7581
-Target Profile: Gemtek XR1710G
-固件格式: sysupgrade.itb (squashfs)
-```
-
----
-
-## 固件信息
-
-| 项目 | 说明 |
+| 文件 | 用途 |
 |------|------|
-| 设备 | Gemtek XR1710G / W1700K |
-| SoC | Airoha AN7581 (ARM64) |
-| 内存 | 2GB DDR4 |
-| 闪存 | 4GB SPI-NAND |
-| WiFi | MT7996 WiFi 7 (2.4G/5G/6G) |
-| 默认IP | 192.168.100.1 (可自定义) |
-| 用户名 | root |
-| 密码 | password |
+| `plugins.conf` | LuCI 插件启停控制 |
+| `diy-part1.sh` | 网络/无线/系统功能配置脚本（feeds 安装后执行） |
+| `diy-part2.sh` | 内核模块/驱动/存储配置脚本（menuconfig 后执行） |
+| `*-xr1710g.seed` | 设备配置种子，定义目标架构和基础包（三个上游通用） |
 
 ---
 
-## 刷入方式
+## plugins.conf — LuCI 插件配置
 
-### 方式一：U-Boot Web 刷入 (推荐)
+**作用：** 控制编译进固件的 LuCI Web 界面插件。修改后重新编译即可生效。
 
-1. **设备断电**
-2. **按住 Reset 按钮**，同时接通电源
-3. **等待 5 秒**，松开 Reset 按钮
-4. 访问 `192.168.1.1` 进入恢复模式
-5. 上传 `*-sysupgrade.itb` 文件
+**工作原理：** Build Firmware 时，workflow 将此文件的 `CONFIG_PACKAGE_luci-app-xxx=y` 行追加到 `.config`，由 OpenWrt Kconfig 处理生成最终固件。
 
-### 方式二：TFTP 刷入
+**格式说明：**
 
-1. 设置电脑 IP: `192.168.1.2/24`
-2. 将固件命名为 `xr1710g-firmware.itb`
-3. 设置 TFTP 服务器
-4. 通过 U-Boot 命令刷入
+```
+CONFIG_PACKAGE_luci-app-xxx=y    # 启用此插件（去掉 #）
+# CONFIG_PACKAGE_luci-app-xxx=y  # 禁用此插件（保留 #）
+```
 
-### 方式三：SSH 刷入 (已有系统)
+**内置插件（默认启用，无需修改）：**
+
+| 插件 | 说明 |
+|------|------|
+| luci-app-uhttpd | Web 服务器（必需） |
+| luci-app-ucode | UCode 区间（必需） |
+| luci-app-firewall | 防火墙（必需） |
+| luci-app-openclash | OpenClash 代理（默认启用） |
+| luci-app-ttyd | Web 终端 |
+| luci-app-autoreboot | 定时重启 |
+
+**按需启用的插件（去掉 # 生效）：**
+
+| 插件 | 说明 | 编译时间 |
+|------|------|---------|
+| luci-app-passwall | PassWall 代理 | 较长 |
+| luci-app-adguardhome | AdGuard Home 广告拦截 | 较长 |
+| luci-app-qbittorrent | qBittorrent 下载 | 较长 |
+| luci-app-aria2 | Aria2 下载 | 中等 |
+| luci-app-diskman | 磁盘管理 | 短 |
+| luci-app-filebrowser | 文件管理 | 短 |
+| luci-app-wireguard | WireGuard VPN | 短 |
+| luci-app-eqos | QoS 流控 | 短 |
+
+**修改示例：** 启用 AdGuard Home 和 PassWall
 
 ```bash
-# 备份配置
-sysupgrade -b /tmp/backup.tar.gz
+# 修改 config/plugins.conf，将：
+# CONFIG_PACKAGE_luci-app-adguardhome=y   # 去掉 # 前缀
+# CONFIG_PACKAGE_luci-app-passwall=y      # 去掉 # 前缀
+```
 
-# 上传固件并刷入 (使用自定义 IP)
-scp openwrt-*-sysupgrade.itb root@192.168.100.1:/tmp/
-ssh root@192.168.100.1
-sysupgrade -n /tmp/openwrt-*-sysupgrade.itb
+> **注意：** plugins.conf 中的 bash 注释（`# 描述文字`）不会影响编译，仅用于说明。
+
+---
+
+## diy-part1.sh — 前置配置脚本
+
+**作用：** 在 `feeds install` 之后、`make` 之前运行，配置网络协议、无线驱动、硬件加速等核心功能。
+
+**执行时机：**
+
+```
+1. ./scripts/feeds update -a
+2. ./scripts/feeds install -a
+          ↓
+3. [diy-part1.sh]  ← 启用网络/无线/系统功能
+          ↓
+4. make defconfig / make menuconfig
+          ↓
+5. [diy-part2.sh]  ← 启用内核模块/驱动
+          ↓
+6. make -j$(nproc)
+```
+
+**各配置项说明：**
+
+| 配置 | 说明 | 是否可修改 |
+|------|------|-----------|
+| `luci-proto-ipv6` | IPv6 协议支持 | 如不需要可注释 `sed` 行 |
+| `kmod-tcp-bbr` / `kmod-tcp-bbr2` | BBR 拥塞控制，提升网络吞吐 | 如不需要可注释整行 |
+| `luci-app-qos` | LuCI QoS 流量控制 | 如不需可注释 |
+| `kmod-nf-flow` / `kmod-ipt-offload` | 连接跟踪和 iptables 卸载加速 | 建议保留，提升 NAT 性能 |
+| `kmod-nft-offload` | nftables 硬件卸载 | 建议保留 |
+| `kmod-airoha-npu` | Airoha AN7581 NPU 网络处理单元驱动 | 建议保留，XR1710G 专用 |
+| `kmod-mt7996e` | MT7996 WiFi 7 驱动（6GHz + 5GHz） | XR1710G WiFi 驱动，勿删 |
+| `kmod-mt7921e` | MT7921 WiFi 6 驱动（2.4GHz） | XR1710G WiFi 驱动，勿删 |
+| `wpad-openssl` | WPA3 / 802.11k/v/r 支持 | 建议保留 |
+| `kmod-phy-airoha` / `kmod-gsw-airoha` | Airoha 万兆 PHY + 交换机驱动 | 建议保留 |
+| `kmod-act-sample` / `iptables-mod-dscp` | DSCP 服务质量标记 | 如不需可注释 |
+| `luci-app-openssh` | OpenSSH | 建议保留 |
+| `TIME_ZONE="CST-8"` | 中国时区 | 可改为其他时区 |
+
+**修改示例：** 禁用 IPv6 支持
+
+```bash
+# 注释掉 diy-part1.sh 中的这行：
+# sed -i 's/# CONFIG_PACKAGE_luci-proto-ipv6 is not set/CONFIG_PACKAGE_luci-proto-ipv6=y/g' .config
 ```
 
 ---
 
-## 自定义插件开发
+## diy-part2.sh — 后置配置脚本
 
-参考: [添加自定义插件说明](../../README.md#添加自定义插件)
+**作用：** 在 `make menuconfig` 之后、`make` 之前运行，配置内核模块、文件系统、存储驱动等硬件相关功能。
+
+**各配置项说明：**
+
+| 配置 | 说明 | 是否可修改 |
+|------|------|-----------|
+| `kmod-nct7802` | NCT7802 风扇/温度传感器驱动 | XR1710G 主板传感器，建议保留 |
+| `kmod-mt7996e` / `kmod-mt7921e` | WiFi 驱动 | 建议保留 |
+| `iw` / `iwinfo` / `wireless-tools` | 无线配置工具 | 建议保留，用于 iwconfig 等 |
+| `kmod-airoha-enet-phy` / `kmod-phylib` / `kmod-phylink` | PHY 网络接口驱动 | 建议保留 |
+| `nft-qos` / `luci-app-nft-qos` | nftables 流量控制 | 如不需可注释 |
+| `block-mount` / `kmod-fs-ext4/vfat/ntfs/exfat` | 文件系统支持（ext4/FAT/NTFS/exFAT） | 按需保留，减少不需要的文件系统可缩短编译时间 |
+| `kmod-mtd` / `kmod-mtd-rw` / `mtd-utils` | SPI-NAND MTD 闪存支持 | XR1710G 必需，勿删 |
+| `luci-app-nlbwmon` | 流量监控 | 如不需可注释 |
+| `luci-app-ledtrig-default-trigger` | LED 指示灯触发 | 如不需可注释 |
+
+**修改示例：** 移除 NTFS 和 exFAT 支持以减少编译时间
+
+```bash
+# 在 diy-part2.sh 中注释：
+# grep -q "CONFIG_PACKAGE_kmod-fs-ntfs=y" .config || echo "CONFIG_PACKAGE_kmod-fs-ntfs=y" >> .config
+# grep -q "CONFIG_PACKAGE_kmod-fs-exfat=y" .config || echo "CONFIG_PACKAGE_kmod-fs-exfat=y" >> .config
+```
+
+---
+
+## *-xr1710g.seed — 设备配置种子
+
+**作用：** 定义目标设备为 Airoha AN7581 / XR1710G 的完整 `.config` 基线，包含目标架构、内核选项和基础包。
+
+**三个文件的区别：**
+
+| 文件 | 对应上游 | 使用场景 |
+|------|---------|---------|
+| `immortalwrt-xr1710g.seed` | ImmortalWrt | 编译 ImmortalWrt 版本时使用 |
+| `openwrt-xr1710g.seed` | OpenWrt | 编译 OpenWrt 版本时使用 |
+| `istoreos-xr1710g.seed` | iStoreOS | 编译 iStoreOS 版本时使用 |
+
+> **当前状态：** 三个 seed 文件内容相同（同一份设备配置），保留三个文件是为将来上游配置出现差异时预留扩展空间。无需分别修改。
+
+**文件内容结构：**
+
+```
+# 自动生成文件，请勿手动编辑
+CONFIG_TARGET_airoha=y                  ← 目标架构为 Airoha
+CONFIG_TARGET_ROOTFS_SQUASHFS=y         ← squashfs 根文件系统
+CONFIG_PACKAGE_luci-app-xxx=y           ← 基础包选择（约2000行）
+CONFIG_KERNEL_xxx=y                    ← 内核配置
+```
+
+**如何修改 seed 文件：**
+
+不建议直接编辑。正确方式：
+1. 运行一次完整的 Build Firmware
+2. 下载 artifact 中的 `config.seed` 文件
+3. 将其重命名为对应的 `{upstream}-xr1710g.seed` 并上传替换
+
+> Seed 文件本质上是完整的 OpenWrt `.config`，由 `make defconfig` + DIY 脚本生成，直接手动修改容易引入格式错误。
+
+---
+
+## 本地编译配置流程
+
+本地编译时，这些文件不会被 workflow 自动覆盖，需确保值正确：
+
+| 文件 | 本地需检查的值 |
+|------|--------------|
+| `docs/system-default` | hostname（默认 ImmortalWrt-XR1710G 等） |
+| `docs/network-default` | LAN IP（默认 192.168.100.1） |
+| `config/plugins.conf` | 插件选择 |
+| `config/diy-part1.sh` | 网络/无线功能 |
+| `config/diy-part2.sh` | 驱动/存储功能 |
+
+### 本地编译完整示例
+
+```bash
+# 1. 准备源码（iStoreOS 为例）
+./scripts/get-source.sh istoreos
+cd istoreos
+
+# 2. 运行业务配置（网络、无线、系统）
+bash ../config/diy-part1.sh
+
+# 3. 选择设备
+make menuconfig
+# Target System → Airoha ARM64
+# Subtarget → AN7581
+# Target Profile → Gemtek XR1710G
+
+# 4. 运行硬件配置（内核模块、驱动、存储）
+bash ../config/diy-part2.sh
+
+# 5. 开始编译
+make -j$(nproc)
+```
+
+---
+
+## 常见问题
+
+**Q: 启用了太多插件，编译内存不足怎么办？**
+A: 减少 `plugins.conf` 中的插件数量，或在 seed 文件中关闭不需要的基础包。
+
+**Q: 编译失败，报 `CONFIG_TARGET_ROOTFS_SIZE` 错误？**
+A: 删除注释或手动设置的 `CONFIG_TARGET_ROOTFS_SIZE`。XR1710G 是 NAND 设备，固件大小由内核自动计算，无需手动指定。
+
+**Q: WiFi 搜不到信号？**
+A: 检查 `diy-part1.sh` 中 `kmod-mt7996e` 和 `kmod-mt7921e` 是否被注释，`wpad-openssl` 是否启用。
+
+**Q: 想添加 plugins.conf 中没有的插件？**
+A: 使用 Sync Plugins workflow 添加第三方 `luci-app-*` 到 `apps/custom/`，然后在 `plugins.conf` 中添加对应的 `CONFIG_PACKAGE_xxx=y` 行。
