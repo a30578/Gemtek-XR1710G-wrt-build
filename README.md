@@ -1,5 +1,7 @@
 # Gemtek XR1710G 固件编译项目
 
+> **⚠️ 暂时不要选择 OpenWrt 和 iStoreOS 进行编译，目前仅推荐使用 ImmortalWrt。**
+
 支持 **OpenWrt** / **ImmortalWrt** / **iStoreOS** 一键编译，可自由选择上游版本和插件组合。
 
 ## 设备支持
