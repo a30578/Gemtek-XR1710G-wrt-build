@@ -11,7 +11,6 @@ on:
         default: 'sync'
         options:
           - sync
-          - diff
           - clear
 
 permissions:
@@ -46,19 +45,6 @@ jobs:
           echo "=== package/boot/uboot-airoha/ ==="
           echo "文件数量: $(find ./tmp-xr1710g-source/package/boot/uboot-airoha -type f | wc -l)"
           find ./tmp-xr1710g-source/package/boot/uboot-airoha -type f
-
-      - name: Diff (if needed)
-        if: github.event.inputs.action == 'diff'
-        run: |
-          for dir in "target/linux/airoha" "package/boot/uboot-airoha"; do
-            if [ -d "$dir" ]; then
-              echo "=== 本地 $dir 与 lvcdy 差异 ==="
-              diff -rq "./tmp-xr1710g-source/$dir" "./$dir" 2>/dev/null || true
-            else
-              echo "$dir 不存在，将全部新增"
-            fi
-            echo ""
-          done
 
       - name: Sync Target and U-Boot Files
         if: github.event.inputs.action == 'sync'

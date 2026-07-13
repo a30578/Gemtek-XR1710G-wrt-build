@@ -107,7 +107,6 @@ make -j$(nproc)
 | 操作 | 说明 |
 |------|------|
 | `sync` | 从上游拉取最新 target/linux/airoha 和 package/boot/uboot-airoha，备份旧文件后替换 |
-| `diff` | 对比本地文件与上游差异（不修改文件） |
 | `clear` | 删除本地 target 文件夹内容，提交清理记录 |
 
 > `target/linux/airoha/` 和 `package/boot/uboot-airoha/` 属于设备专用定制，不参与上游合并，通过此 workflow 独立维护。
