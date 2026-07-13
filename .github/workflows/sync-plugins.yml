@@ -203,29 +203,20 @@ jobs:
           echo "=== Git 状态 ==="
           echo "当前目录: $(pwd)"
           ls -la apps/custom/
-
           echo ""
           echo "=== 推送前同步远程 ==="
           git fetch origin
           git rebase origin/main
 
           echo ""
-          echo "=== 检查 git status ==="
+          echo "=== clone 模式：直接提交最新插件 ==="
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add "apps/custom/$REPO_NAME"
           git status
-
-          echo ""
-          if ! git diff --quiet apps/custom/ 2>/dev/null; then
-            echo "检测到变化，正在提交..."
-            git config user.name "GitHub Actions"
-            git config user.email "actions@github.com"
-            git add "apps/custom/$REPO_NAME"
-            git status
-            git commit -m "add: $REPO_NAME plugins ($(date +%Y%m%d))"
-            git push
-            echo "✅ 已推送: apps/custom/$REPO_NAME"
-          else
-            echo "无需提交"
-          fi
+          git commit --allow-empty -m "add: $REPO_NAME plugins ($(date +%Y%m%d))"
+          git push
+          echo "✅ 已推送: apps/custom/$REPO_NAME"
 
   clear-plugins:
     needs: [determine-repo, list-plugins]
