@@ -20,8 +20,8 @@
 | 版本 | 分支 | 特点 | 选择参数 |
 |------|------|------|---------|
 | **iStoreOS** | openwrt-25.12 | 易用 Web 界面，预装丰富插件 | 选择 iStoreOS |
-| **ImmortalWrt** | openwrt-25.12 | 预装丰富插件 (OpenClash/PassWall/dae/AdGuard Home) | 选择 ImmortalWrt |
-| **OpenWrt** | openwrt-25.12 | 最小化定制，更接近上游 | 选择 OpenWrt |
+| **ImmortalWrt** | master | 预装丰富插件 (OpenClash/PassWall/dae/AdGuard Home) | 选择 ImmortalWrt |
+| **OpenWrt** | main | 最小化定制，更接近上游 | 选择 OpenWrt |
 
 ## Actions 工作流
 
@@ -118,55 +118,33 @@
 
 ### 方法二：本地编译
 
-**方式一：使用自动化脚本（推荐）**
+**⚠️ 编译前需先通过 Sync workflows 同步 target 和插件文件，否则缺少设备文件和第三方插件。**
 
 ```bash
 # 克隆仓库
 git clone https://github.com/Arthur97172/Gemtek-XR1710G-wrt-build.git
 cd Gemtek-XR1710G-wrt-build
-
-# 一键准备编译环境（克隆源码 + 安装依赖 + 配置 feeds）
-./scripts/get-source.sh              # 默认克隆 iStoreOS
-./scripts/get-source.sh immortalwrt  # 克隆 ImmortalWrt
-./scripts/get-source.sh openwrt      # 克隆 OpenWrt
-./scripts/get-source.sh all          # 同时克隆三个版本
-
-# 配置并编译 (以 iStoreOS 为例)
-cd istoreos
-source diy/diy-part1.sh              # 运行业务配置
-make menuconfig                      # 选择设备
-source ../diy/diy-part2.sh           # 运行硬件配置
-make -j$(nproc)                      # 开始编译
-```
-
-**方式二：手动配置**
-
-```bash
-# 克隆仓库
-git clone https://github.com/Arthur97172/Gemtek-XR1710G-wrt-build.git
-cd Gemtek-XR1710G-wrt-build
-
-# 选择要编译的上游版本 (三选一):
-
-# ========== iStoreOS ==========
-git clone --depth=1 --branch=openwrt-25.12 https://github.com/istoreos/istoreos.git istoreos
-cd istoreos
-./scripts/feeds update -a && ./scripts/feeds install -a
 
 # ========== ImmortalWrt ==========
-git clone --depth=1 --branch=openwrt-25.12 https://github.com/immortalwrt/immortalwrt.git immortalwrt
+git clone --depth=1 --branch=master https://github.com/immortalwrt/immortalwrt.git immortalwrt
 cd immortalwrt
-./scripts/feeds update -a && ./scripts/feeds install -a
 
-# ========== OpenWrt ==========
-git clone --depth=1 --branch=openwrt-25.12 https://github.com/openwrt/openwrt.git openwrt
-cd openwrt
-./scripts/feeds update -a && ./scripts/feeds install -a
+# 复制设备文件和插件（位于本仓库）
+cp -r ../target/linux/airoha target/linux/
+cp -r ../package/boot/uboot-airoha package/boot/
+cp -r ../apps/custom package/custom/
 
-# 配置 (通用)
+# 编译配置
+./scripts/feeds update -a && ./scripts/feeds install -a
+# 加载设备配置
+cat ../config/immortalwrt-xr1710g.seed >> .config
+# 运行业务配置
+bash ../config/diy-part1.sh
+# 选择设备
 make menuconfig
-# 选择: Target System → Airoha ARM64, Subtarget → AN7581, Target Profile → Gemtek XR1710G
-
+# Target System → Airoha ARM64, Subtarget → AN7581, Target Profile → Gemtek XR1710G
+# 运行硬件配置
+bash ../config/diy-part2.sh
 # 编译
 make -j$(nproc)
 ```
