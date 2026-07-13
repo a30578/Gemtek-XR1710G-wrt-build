@@ -349,13 +349,14 @@ jobs:
       - name: Process Artifacts
         if: success()
         run: |
-          mkdir -p artifacts
+          ARTIFACTS="$GITHUB_WORKSPACE/artifacts"
+          mkdir -p "$ARTIFACTS"
           cd build/upstream
-          find . -name "*.itb" -exec cp {} ../artifacts/ \; 2>/dev/null || true
-          find . -name "*sysupgrade*.itb" -exec cp {} ../artifacts/ \; 2>/dev/null || true
-          cp .config ../artifacts/config.seed
+          find . -name "*.itb" -exec cp {} "$ARTIFACTS/" \; 2>/dev/null || true
+          find . -name "*sysupgrade*.itb" -exec cp {} "$ARTIFACTS/" \; 2>/dev/null || true
+          cp .config "$ARTIFACTS/config.seed"
           echo "=== Artifacts ==="
-          ls -la ../artifacts/
+          ls -la "$ARTIFACTS/"
 
       - name: Upload Firmware
         if: success()
