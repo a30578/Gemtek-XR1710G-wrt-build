@@ -149,6 +149,31 @@ make menuconfig
 bash ../config/diy-part2.sh
 # 编译
 make -j$(nproc)
+
+# ========== OpenWrt ==========
+git clone --depth=1 --branch=main https://github.com/openwrt/openwrt.git openwrt
+cd openwrt
+
+# 复制设备文件和插件（位于本仓库）
+cp -r ../target/linux/airoha target/linux/
+cp -r ../package/boot/uboot-airoha package/boot/
+cp -r ../apps/custom package/custom/
+
+# 编译配置
+./scripts/feeds update -a && ./scripts/feeds install -a
+# 加载设备配置
+cat ../config/openwrt-xr1710g.seed >> .config
+# 启用插件（过滤 CONFIG_PACKAGE_ 行追加到 .config）
+grep "^CONFIG_PACKAGE_" ../config/plugins.conf >> .config
+# 运行业务配置
+bash ../config/diy-part1.sh
+# 选择设备
+make menuconfig
+# Target System → Airoha ARM64, Subtarget → AN7581, Target Profile → Gemtek XR1710G
+# 运行硬件配置
+bash ../config/diy-part2.sh
+# 编译
+make -j$(nproc)
 ```
 
 ## 插件管理
