@@ -1,8 +1,6 @@
 # Gemtek XR1710G 固件编译项目
 
-> **⚠️ 暂时不要选择 OpenWrt 和 iStoreOS 进行编译，目前仅推荐使用 ImmortalWrt。**
-
-支持 **OpenWrt** / **ImmortalWrt** / **iStoreOS** 一键编译，可自由选择上游版本和插件组合。
+支持 **ImmortalWrt** / **OpenWrt** 一键编译，可自由选择上游版本和插件组合。
 
 ## 设备支持
 
@@ -19,7 +17,6 @@
 
 | 版本 | 分支 | 特点 | 选择参数 |
 |------|------|------|---------|
-| **iStoreOS** | openwrt-25.12 | 易用 Web 界面，预装丰富插件 | 选择 iStoreOS |
 | **ImmortalWrt** | master | 预装丰富插件 (OpenClash/PassWall/dae/AdGuard Home) | 选择 ImmortalWrt |
 | **OpenWrt** | main | 最小化定制，更接近上游 | 选择 OpenWrt |
 
@@ -83,7 +80,7 @@
 
 | 参数 | 默认值 | 说明 |
 |------|--------|------|
-| upstream | immortalwrt | 上游版本：istoreos / immortalwrt / openwrt |
+| upstream | immortalwrt | 上游版本：immortalwrt / openwrt |
 | lan_ip | 192.168.100.1 | 路由 LAN 口 IP |
 | wifi_password | 12345678 | WiFi 密码 |
 | debug | false | 调试模式 |
@@ -237,14 +234,14 @@ CONFIG_PACKAGE_luci-app-ttyd=y         # Web 终端
 
 ## 默认配置
 
-| 项目 | OpenWrt / ImmortalWrt | iStoreOS |
-|------|----------------------|----------|
-| 管理 IP | 192.168.100.1 | 192.168.100.1 |
-| 用户名 | root | root |
-| 密码 | 无（首次登录设置） | password |
-| WiFi 密码 | 12345678 | 12345678 |
-| WAN 口 | 第 1 个网口 | 第 1 个网口 |
-| LAN 口 | 其余网口 | 其余网口 |
+| 项目 | OpenWrt / ImmortalWrt |
+|------|----------------------|
+| 管理 IP | 192.168.100.1 |
+| 用户名 | root |
+| 密码 | 无（首次登录设置） |
+| WiFi 密码 | 12345678 |
+| WAN 口 | 第 1 个网口 |
+| LAN 口 | 其余网口 |
 
 ## 常见问题
 

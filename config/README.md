@@ -11,7 +11,7 @@
 | `plugins.conf` | LuCI 插件启停控制 |
 | `diy-part1.sh` | 网络/无线/系统功能配置脚本（feeds 安装后执行） |
 | `diy-part2.sh` | 内核模块/驱动/存储配置脚本（menuconfig 后执行） |
-| `*-xr1710g.seed` | 设备配置种子，定义目标架构和基础包（三个上游通用） |
+| `*-xr1710g.seed` | 设备配置种子，定义目标架构和基础包（immortalwrt / openwrt） |
 
 ---
 
@@ -142,15 +142,14 @@ CONFIG_PACKAGE_luci-app-xxx=y    # 启用此插件（去掉 #）
 
 **作用：** 定义目标设备为 Airoha AN7581 / XR1710G 的完整 `.config` 基线，包含目标架构、内核选项和基础包。
 
-**三个文件的区别：**
+**两个文件的区别：**
 
 | 文件 | 对应上游 | 使用场景 |
 |------|---------|---------|
 | `immortalwrt-xr1710g.seed` | ImmortalWrt | 编译 ImmortalWrt 版本时使用 |
 | `openwrt-xr1710g.seed` | OpenWrt | 编译 OpenWrt 版本时使用 |
-| `istoreos-xr1710g.seed` | iStoreOS | 编译 iStoreOS 版本时使用 |
 
-> **当前状态：** 三个 seed 文件内容相同（同一份设备配置），保留三个文件是为将来上游配置出现差异时预留扩展空间。无需分别修改。
+> **当前状态：** 两个 seed 文件内容相同（同一份设备配置），保留不同文件名是为将来上游配置出现差异时预留扩展空间。无需分别修改。
 
 **文件内容结构：**
 
@@ -188,9 +187,9 @@ CONFIG_KERNEL_xxx=y                    ← 内核配置
 ### 本地编译完整示例
 
 ```bash
-# 1. 准备源码（iStoreOS 为例）
-./scripts/get-source.sh istoreos
-cd istoreos
+# 1. 准备源码（ImmortalWrt 为例）
+./scripts/get-source.sh immortalwrt
+cd immortalwrt
 
 # 2. 运行业务配置（网络、无线、系统）
 bash ../config/diy-part1.sh

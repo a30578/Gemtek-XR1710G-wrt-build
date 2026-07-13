@@ -10,7 +10,6 @@ on:
         required: true
         default: 'immortalwrt'
         options:
-          - istoreos
           - immortalwrt
           - openwrt
       lan_ip:
@@ -47,10 +46,6 @@ jobs:
 
           # 根据上游版本设置分支
           case "$UPSTREAM" in
-            istoreos)
-              echo "branch=openwrt-25.12" >> $GITHUB_OUTPUT
-              echo "repo=https://github.com/istoreos/istoreos.git" >> $GITHUB_OUTPUT
-              ;;
             immortalwrt)
               echo "branch=master" >> $GITHUB_OUTPUT
               echo "repo=https://github.com/immortalwrt/immortalwrt.git" >> $GITHUB_OUTPUT
@@ -201,9 +196,6 @@ jobs:
 
           # 根据上游版本设置hostname
           case "$upstream" in
-            istoreos)
-              HOSTNAME="iStoreOS-XR1710G"
-              ;;
             immortalwrt)
               HOSTNAME="ImmortalWrt-XR1710G"
               ;;
@@ -298,10 +290,10 @@ jobs:
 
           # 根据上游版本动态设置 UPSTREAM 变量
           case "$upstream" in
-            istoreos|immortalwrt)
+            openwrt)
               UPSTREAM_VALUE="openwrt"
               ;;
-            openwrt)
+            *)
               UPSTREAM_VALUE="openwrt"
               ;;
           esac
