@@ -135,12 +135,20 @@ jobs:
           git config user.email "actions@github.com"
           git add target/linux/airoha package/boot/uboot-airoha 2>/dev/null || true
           git commit -m "clear: remove target + uboot-airoha ($(date +%Y%m%d))" || echo "无需提交"
+          echo ""
+          echo "=== 推送前同步远程 ==="
+          git fetch origin
+          git rebase origin/main
           git push || echo "推送失败"
           echo "✅ 已处理"
 
       - name: Commit and Push
         if: github.event.inputs.action == 'sync'
         run: |
+          echo "=== 推送前同步远程 ==="
+          git fetch origin
+          git rebase origin/main
+          echo ""
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add target/linux/airoha/ package/boot/uboot-airoha/
