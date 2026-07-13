@@ -354,8 +354,8 @@ jobs:
           ARTIFACTS="$GITHUB_WORKSPACE/artifacts"
           mkdir -p "$ARTIFACTS"
           cd build/upstream
-          find . -name "*.itb" -exec cp {} "$ARTIFACTS/" \; 2>/dev/null || true
-          find . -name "*sysupgrade*.itb" -exec cp {} "$ARTIFACTS/" \; 2>/dev/null || true
+          for f in $(find . -name "*.itb"); do cp -n "$f" "$ARTIFACTS/"; done
+          for f in $(find . -name "*sysupgrade*.itb"); do cp -n "$f" "$ARTIFACTS/"; done
           cp .config "$ARTIFACTS/config.seed"
           echo "=== Artifacts ==="
           ls -la "$ARTIFACTS/"
@@ -365,7 +365,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: XR1710G-Firmware-${{ inputs.upstream }}
-          path: artifacts/*
+          path: artifacts/**/*
 
       - name: Get Current Date
         id: date
