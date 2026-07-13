@@ -367,11 +367,16 @@ jobs:
           name: XR1710G-Firmware-${{ inputs.upstream }}
           path: artifacts/*
 
+      - name: Get Current Date
+        id: date
+        run: |
+          echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+
       - name: Create Release
         if: success()
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ inputs.upstream }}
+          tag_name: ${{ steps.date.outputs.date }}-${{ inputs.upstream }}
           name: ${{ inputs.upstream }} Build
           files: artifacts/*
           draft: false
