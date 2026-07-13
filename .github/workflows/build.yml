@@ -377,7 +377,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.date.outputs.date }}-${{ inputs.upstream }}
-          name: ${{ inputs.upstream }} Build
+          name: ${{ steps.date.outputs.date }}-${{ inputs.upstream }} Build
           files: artifacts/*
           draft: false
           generate_release_notes: true
