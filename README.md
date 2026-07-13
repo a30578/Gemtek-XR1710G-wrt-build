@@ -138,6 +138,8 @@ cp -r ../apps/custom package/custom/
 ./scripts/feeds update -a && ./scripts/feeds install -a
 # 加载设备配置
 cat ../config/immortalwrt-xr1710g.seed >> .config
+# 启用插件（过滤 CONFIG_PACKAGE_ 行追加到 .config）
+grep "^CONFIG_PACKAGE_" ../config/plugins.conf >> .config
 # 运行业务配置
 bash ../config/diy-part1.sh
 # 选择设备
