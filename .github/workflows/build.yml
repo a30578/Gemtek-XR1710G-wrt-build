@@ -1,0 +1,388 @@
+name: Build Firmware
+run-name: ${{ inputs.upstream }} Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      upstream:
+        description: '选择上游版本 / Select Upstream'
+        type: choice
+        required: true
+        default: 'immortalwrt'
+        options:
+          - istoreos
+          - immortalwrt
+          - openwrt
+      lan_ip:
+        description: 'LAN IP 地址 / LAN IP Address'
+        type: string
+        default: '192.168.100.1'
+        required: false
+      wifi_password:
+        description: 'WiFi 密码 / WiFi Password'
+        type: string
+        default: '12345678'
+        required: false
+      debug:
+        description: '调试模式 / Debug Mode'
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 600
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Upstream
+        id: upstream
+        run: |
+          UPSTREAM=${{ inputs.upstream }}
+          echo "version=$UPSTREAM" >> $GITHUB_OUTPUT
+
+          # 根据上游版本设置分支
+          case "$UPSTREAM" in
+            istoreos)
+              echo "branch=openwrt-25.12" >> $GITHUB_OUTPUT
+              echo "repo=https://github.com/istoreos/istoreos.git" >> $GITHUB_OUTPUT
+              ;;
+            immortalwrt)
+              echo "branch=openwrt-25.12" >> $GITHUB_OUTPUT
+              echo "repo=https://github.com/immortalwrt/immortalwrt.git" >> $GITHUB_OUTPUT
+              ;;
+            openwrt)
+              echo "branch=openwrt-25.12" >> $GITHUB_OUTPUT
+              echo "repo=https://github.com/openwrt/openwrt.git" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
+          echo "构建版本: $UPSTREAM (${{ steps.upstream.outputs.branch }})"
+
+      - name: Clean disk space
+        run: |
+          echo "=== 清理前的磁盘空间 ==="
+          df -h /
+
+          echo "=== 开始清理 ==="
+          # 清理 apt 缓存
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
+          sudo rm -rf /var/cache/apt/archives/*
+          sudo rm -rf /var/backups/*
+
+          # 清理旧的 GitHub Actions 缓存
+          sudo rm -rf /home/runner/.cache
+          sudo rm -rf /home/runner/work/_temp
+
+          # 清理无用的大型工具链目录 (参考 hx801217 方案)
+          sudo rm -rf /etc/apt/sources.list.d/*
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/share/swift
+          sudo rm -rf /usr/share/android-sdk
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /etc/mysql
+          sudo rm -rf /etc/php
+
+          # 清理旧的内核和 headers
+          sudo rm -rf /var/lib/dpkg/info/*
+          sudo rm -rf /usr/share/doc/*
+          sudo rm -rf /usr/share/locale/*
+          sudo rm -rf /usr/share/man/??
+          sudo find /usr/share/doc -type f -delete 2>/dev/null || true
+
+          # 清理旧日志
+          sudo rm -rf /var/log/*.1 /var/log/*.log 2>/dev/null || true
+          sudo journalctl --vacuum-time=1s 2>/dev/null || true
+
+          echo "=== 清理后的磁盘空间 ==="
+          df -h /
+
+      - name: Clone Upstream Source
+        run: |
+          upstream=${{ inputs.upstream }}
+          branch=${{steps.upstream.outputs.branch}}
+          repo=${{steps.upstream.outputs.repo}}
+
+          echo "=== 克隆前磁盘空间 ==="
+          df -h /
+
+          echo "开始克隆 $upstream ($branch)..."
+          echo "仓库地址: $repo"
+
+          # 使用通用目录名 build/upstream，使用 --depth=1 最小化克隆
+          git clone --depth=1 --branch=$branch --single-branch "$repo" build/upstream
+
+          echo "=== 克隆完成，清理 .git 节省空间 ==="
+          cd build/upstream
+
+          # 删除示例文件和文档节省空间
+          rm -rf docs
+          rm -rf scripts/package-metadata
+          rm -rf .github
+          rm -rf LICENSE README.md CONTRIBUTING.md 2>/dev/null || true
+
+          # 清理 .git 目录中的缓存，保留 .git 目录本身
+          rm -rf .git/objects/pack .git/objects/info
+          rm -rf .git/refs
+          git gc --aggressive --prune=all 2>/dev/null || true
+
+          echo "=== 源码目录大小 ==="
+          du -sh .
+
+          echo "=== 克隆完成后的磁盘空间 ==="
+          df -h /
+
+      - name: Copy Target Files
+        run: |
+          echo "=== 复制本仓库 target/linux/airoha 到编译环境 ==="
+          if [ -d "target/linux/airoha" ]; then
+            echo "文件数量: $(find target/linux/airoha -type f | wc -l)"
+          else
+            echo "⚠️ target/linux/airoha 不存在，请先运行 Sync Target Files workflow"
+          fi
+
+          # 用本仓库的 target 文件覆盖（XR1710G 设备树等）
+          cp -rf target/linux/airoha build/upstream/target/linux/airoha
+
+      - name: Copy U-Boot Airoha
+        run: |
+          echo "=== 复制 package/boot/uboot-airoha 到编译环境 ==="
+          cp -rf package/boot/uboot-airoha build/upstream/package/boot/uboot-airoha
+
+          echo ""
+          echo "=== 验证关键文件 ==="
+          for f in \
+            "build/upstream/target/linux/airoha/dts/an7581-xr1710g-ubi.dts" \
+            "build/upstream/target/linux/airoha/image/an7581.mk" \
+            "build/upstream/package/boot/uboot-airoha/patches/999-00-airoha-add-gemtek-xr1710g.patch" \
+            "build/upstream/package/boot/uboot-airoha/files/an7581-bl31.bin"; do
+            if [ -f "$f" ]; then
+              echo "✅ $f"
+            else
+              echo "❌ $f 缺失"
+            fi
+          done
+
+      - name: Copy Custom Plugins
+        run: |
+          echo "=== 复制 apps/custom 插件到编译环境 ==="
+          if [ -d "apps/custom" ]; then
+            echo "自定义插件目录:"
+            ls -la apps/custom/
+            echo "插件 Makefile 数量: $(find apps/custom -name Makefile -path "*luci-app*" | wc -l)"
+            # 复制到 OpenWrt 编译目录
+            cp -rf apps/custom build/upstream/package/custom
+            echo "=== 验证插件已复制 ==="
+            find build/upstream/package/custom -name Makefile -path "*luci-app*" | wc -l
+            echo "个 luci-app 插件已就绪"
+          else
+            echo "⚠️ apps/custom 不存在，跳过（请先运行 Sync Plugins workflow）"
+          fi
+
+      - name: Create Default Config
+        run: |
+          upstream=${{ inputs.upstream }}
+          config_dir="build/upstream/package/base-files/files/etc/config"
+          mkdir -p "$config_dir"
+
+          # 获取用户自定义 IP 或使用默认值
+          LAN_IP="${{ inputs.lan_ip }}"
+          [ -z "$LAN_IP" ] && LAN_IP="192.168.100.1"
+
+          # 获取用户自定义 WiFi 密码或使用默认值
+          WIFI_PASS="${{ inputs.wifi_password }}"
+          [ -z "$WIFI_PASS" ] && WIFI_PASS="12345678"
+
+          # 根据上游版本设置hostname
+          case "$upstream" in
+            istoreos)
+              HOSTNAME="iStoreOS-XR1710G"
+              ;;
+            immortalwrt)
+              HOSTNAME="ImmortalWrt-XR1710G"
+              ;;
+            openwrt)
+              HOSTNAME="OpenWrt-XR1710G"
+              ;;
+          esac
+
+          # 生成 system 配置 - 替换 hostname
+          sed "s/__HOSTNAME__/$HOSTNAME/g" docs/system-default > "$config_dir/system"
+
+          # 生成 network 配置 - 替换 LAN IP
+          sed "s/__LAN_IP__/$LAN_IP/g" docs/network-default > "$config_dir/network"
+
+          # 生成 wireless 配置 - 替换 WiFi 密码
+          sed "s/__WIFI_PASSWORD__/$WIFI_PASS/g" docs/wireless-default > "$config_dir/wireless"
+
+          echo "Default config created. Hostname: $HOSTNAME, LAN IP: $LAN_IP, WiFi PASS: $WIFI_PASS"
+
+      - name: Configure Build
+        run: |
+          echo "=== 配置前磁盘空间 ==="
+          df -h /
+
+          # 设置 upstream 变量
+          upstream=${{ inputs.upstream }}
+
+          cd build/upstream
+
+          # 更新和安装 feeds (必要的 feeds 必须正确安装)
+          echo "=== 更新 feeds ==="
+          ./scripts/feeds update -a
+          echo "=== 安装 feeds ==="
+          ./scripts/feeds install -a
+
+          # 创建基础配置 (非交互式)
+          echo "=== 运行 defconfig ==="
+          make defconfig
+
+          # 启用 ccache
+          echo "CONFIG_CCACHE=y" >> .config
+          echo "CONFIG_BUILD_LOG=y" >> .config
+
+          # 清理 feeds 临时缓存释放空间
+          echo "=== 清理临时文件 ==="
+          rm -rf tmp
+          rm -rf package/feeds/*/tmp
+          find . -name "*.pyc" -delete 2>/dev/null || true
+
+          # 切换到 repo 根执行定制脚本和 seed 配置
+          echo "=== 应用设备配置种子 + 定制脚本 ==="
+          ROOT_DIR=$PWD
+          cd ../..
+
+          # 应用设备配置种子
+          SEED_FILE="config/${upstream}-xr1710g.seed"
+          echo "使用种子配置: $SEED_FILE"
+          cat $SEED_FILE >> $ROOT_DIR/.config
+
+          # 运行前置定制脚本（网络功能、IPv6、BBR、NPU、WiFi）
+          chmod +x config/diy-part1.sh
+          bash config/diy-part1.sh
+
+          # 运行后置定制脚本（内核模块、驱动、系统工具）
+          chmod +x config/diy-part2.sh
+          bash config/diy-part2.sh
+
+          cd $ROOT_DIR
+
+          # 运行 olddefconfig 处理新配置项
+          echo "=== 运行 olddefconfig ==="
+          make olddefconfig || make defconfig
+
+          # 保存种子配置
+          cp .config ../config.seed
+
+          echo "=== 配置后磁盘空间 ==="
+          df -h /
+          echo "Device configured: Airoha AN7581 -> XR1710G (via ${upstream}-xr1710g.seed)"
+
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: build/upstream/ccache
+          key: ccache-${{ runner.os }}-${{ inputs.upstream }}-${{ hashFiles('build/upstream/.config') }}
+          restore-keys: |
+            ccache-${{ runner.os }}-${{ inputs.upstream }}-
+
+      - name: Apply Plugin Configuration
+        run: |
+          upstream=${{ inputs.upstream }}
+
+          # 根据上游版本动态设置 UPSTREAM 变量
+          case "$upstream" in
+            istoreos|immortalwrt)
+              UPSTREAM_VALUE="openwrt"
+              ;;
+            openwrt)
+              UPSTREAM_VALUE="openwrt"
+              ;;
+          esac
+
+          # 创建临时配置文件，替换 UPSTREAM
+          grep -v "^UPSTREAM=" config/plugins.conf > /tmp/plugins-modified.conf
+          echo "UPSTREAM=\"$UPSTREAM_VALUE\"" >> /tmp/plugins-modified.conf
+
+          # 追加到 .config
+          cat /tmp/plugins-modified.conf >> build/upstream/.config
+
+          # 运行非交互式配置更新
+          cd build/upstream
+          make olddefconfig || make defconfig
+
+          echo "配置已应用:"
+          echo "  - UPSTREAM=${UPSTREAM_VALUE}"
+          echo "  - Device: XR1710G"
+
+      - name: Build Firmware
+        run: |
+          echo "=== 构建前磁盘空间 ==="
+          df -h /
+          echo "可用内存："
+          free -h
+
+          cd build/upstream
+          export CCACHE_DIR="$PWD/ccache"
+          export CCACHE_SIZE="10G"
+          export PATH="/usr/lib/ccache:$PATH"
+
+          # 清理可能存在的旧构建文件
+          rm -rf tmp 2>/dev/null || true
+
+          # 尝试并行编译，失败时自动降级 (参考 hx801217 方案)
+          make -j$(nproc) V=sc 2>&1 | tee build.log || make -j2 V=s 2>&1 | tee -a build.log || make -j1 V=s 2>&1 | tee -a build.log
+
+          echo "=== 查找固件 ==="
+          find . -name "*.itb" -o -name "*.bin" 2>/dev/null | head -20
+
+          echo "=== 构建后磁盘空间 ==="
+          df -h /
+
+          echo "=== ccache 统计 ==="
+          ccache -s || true
+
+      - name: Process Artifacts
+        if: success()
+        run: |
+          mkdir -p artifacts
+          cd build/upstream
+          find . -name "*.itb" -exec cp {} ../artifacts/ \; 2>/dev/null || true
+          find . -name "*sysupgrade*.itb" -exec cp {} ../artifacts/ \; 2>/dev/null || true
+          cp .config ../artifacts/config.seed
+          echo "=== Artifacts ==="
+          ls -la ../artifacts/
+
+      - name: Upload Firmware
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: XR1710G-Firmware-${{ inputs.upstream }}
+          path: artifacts/*
+
+      - name: Create Release
+        if: success()
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ inputs.upstream }}-$(date +%Y%m%d-%H%M)
+          name: ${{ inputs.upstream }} Build $(date +%Y%m%d-%H%M)
+          files: artifacts/*
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Build Log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-${{ inputs.upstream }}
+          path: build/upstream/build.log
+
+      - name: Notify Failure
+        if: failure()
+        run: |
+          echo "Build failed! Check the logs for details."

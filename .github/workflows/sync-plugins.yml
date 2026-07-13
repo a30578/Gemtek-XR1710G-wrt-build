@@ -1,0 +1,277 @@
+name: Sync Plugins
+run-name: Sync Custom Plugins
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: '操作 / Action'
+        type: choice
+        required: true
+        default: 'clone'
+        options:
+          - clone
+          - clear
+
+      repo_preset:
+        description: '选择预设仓库 / Select Preset'
+        type: choice
+        required: true
+        default: 'kenzok8/small-package'
+        options:
+          - 'kenzok8/small-package'
+          - 'kenzok8/openwrt-packages'
+          - 'fw876/helloworld'
+          - 'vernesong/OpenClash'
+          - 'kiddin9/op-packages'
+          - 'custom'
+
+      repo_custom:
+        description: '如果上面选了 custom，在此处输入自定义路径 (owner/repo)'
+        type: string
+        required: false
+        default: ''
+
+jobs:
+  determine-repo:
+    runs-on: ubuntu-latest
+    outputs:
+      repo_path: ${{ steps.repo.outputs.repo_path }}
+      repo_branch: ${{ steps.repo.outputs.repo_branch }}
+    steps:
+      - name: Determine Repo Path and Branch
+        id: repo
+        run: |
+          REPO_PRESET="${{ github.event.inputs.repo_preset }}"
+          REPO_CUSTOM="${{ github.event.inputs.repo_custom }}"
+
+          if [ "$REPO_PRESET" = "custom" ]; then
+            REPO_PATH="$REPO_CUSTOM"
+          else
+            REPO_PATH="$REPO_PRESET"
+          fi
+          echo "repo_path=$REPO_PATH" >> $GITHUB_OUTPUT
+
+          # 常用仓库的默认分支预定义
+          case "$REPO_PATH" in
+            kenzok8/small-package)
+              DEFAULT_BRANCH="main"
+              ;;
+            kenzok8/openwrt-packages)
+              DEFAULT_BRANCH="master"
+              ;;
+            fw876/helloworld)
+              DEFAULT_BRANCH="dev"
+              ;;
+            vernesong/OpenClash)
+              DEFAULT_BRANCH="master"
+              ;;
+            kiddin9/op-packages)
+              DEFAULT_BRANCH="main"
+              ;;
+            *)
+              # 未知仓库，通过 API 检测
+              DEFAULT_BRANCH=$(curl -s "https://api.github.com/repos/$REPO_PATH" 2>/dev/null | grep -o '"default_branch": "[^"]*' | cut -d'"' -f4)
+              if [ -z "$DEFAULT_BRANCH" ]; then
+                DEFAULT_BRANCH="main"
+              fi
+              ;;
+          esac
+
+          echo "repo_branch=$DEFAULT_BRANCH" >> $GITHUB_OUTPUT
+          echo "=== 仓库: $REPO_PATH"
+          echo "=== 分支: $DEFAULT_BRANCH ==="
+
+  list-plugins:
+    runs-on: ubuntu-latest
+    needs: determine-repo
+    outputs:
+      repo_path: ${{ needs.determine-repo.outputs.repo_path }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: List Custom Plugins
+        run: |
+          echo "### 📦 Custom Plugins 目录结构" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          PLUGINS=$(find apps/custom -type f -name Makefile 2>/dev/null | wc -l)
+          echo "插件数量: $PLUGINS" >> $GITHUB_STEP_SUMMARY
+
+          echo ""
+          echo "=== 插件列表 ==="
+          find apps/custom -maxdepth 3 -type d 2>/dev/null | while read dir; do
+            if [ -f "$dir/Makefile" ]; then
+              name=$(basename "$dir")
+              echo "✅ $name"
+            fi
+          done
+
+          if [ -z "$(ls -A apps/custom 2>/dev/null)" ]; then
+            echo "⚠️  apps/custom 目录为空"
+          fi
+
+      - name: Show Plugin Details
+        run: |
+          echo ""
+          echo "=== 插件详情 ==="
+          for plugin in apps/custom/*/; do
+            if [ -d "$plugin" ] && [ -f "$plugin/Makefile" ]; then
+              name=$(basename "$plugin")
+              echo ""
+              echo "📁 $name"
+              file_count=$(find "$plugin" -type f 2>/dev/null | wc -l)
+              echo "   文件数: $file_count"
+            fi
+          done
+
+  clone-plugin:
+    needs: [determine-repo, list-plugins]
+    if: github.event.inputs.action == 'clone'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Download Plugin Repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ needs.determine-repo.outputs.repo_path }}
+          ref: ${{ needs.determine-repo.outputs.repo_branch }}
+          path: ./tmp-plugin-repo
+          token: ${{ github.token }}
+          fetch-depth: 1
+
+      - name: Copy All Plugins to apps/custom
+        run: |
+          REPO_PATH="${{ needs.determine-repo.outputs.repo_path }}"
+          REPO_NAME=$(basename "$REPO_PATH")
+
+          echo "仓库: $REPO_PATH"
+          echo "目标目录: apps/custom/$REPO_NAME"
+          echo "当前目录: $(pwd)"
+          echo ""
+
+          # 计算仓库中有多少个 luci-app 插件
+          PLUGIN_COUNT=$(find "./tmp-plugin-repo" -maxdepth 2 -name "Makefile" -path "*luci-app*" | wc -l)
+          echo "发现 $PLUGIN_COUNT 个 luci-app 插件"
+
+          # 显示所有可用的插件
+          echo ""
+          echo "=== 可用插件列表 ==="
+          find "./tmp-plugin-repo" -maxdepth 2 -name "Makefile" -path "*luci-app*" -exec dirname {} \; | while read dir; do
+            name=$(basename "$dir")
+            echo "- ${name#luci-app-}"
+          done
+
+          # 如果已存在该仓库目录，先备份
+          if [ -d "apps/custom/$REPO_NAME" ]; then
+            mkdir -p apps/custom.bak
+            rm -rf "apps/custom.bak/$REPO_NAME"
+            cp -r "apps/custom/$REPO_NAME" "apps/custom.bak/$REPO_NAME"
+            echo ""
+            echo "已备份旧版本到 apps/custom.bak/$REPO_NAME"
+          fi
+
+          # 复制整个仓库到 apps/custom
+          mkdir -p apps/custom
+          rm -rf "apps/custom/$REPO_NAME"
+          cp -r "./tmp-plugin-repo" "apps/custom/$REPO_NAME"
+
+          # 删除 .git 目录（避免 embedded repository 问题）
+          rm -rf "apps/custom/$REPO_NAME/.git"
+
+          echo ""
+          echo "=== 复制后的目录结构 ==="
+          ls -la apps/custom/
+
+          # 验证文件确实存在
+          echo ""
+          echo "=== 验证插件文件 ==="
+          find "apps/custom/$REPO_NAME" -type f -name "Makefile" -path "*luci-app*" | wc -l
+          echo "个 luci-app 插件已复制"
+
+      - name: Commit and Push
+        run: |
+          REPO_PATH="${{ needs.determine-repo.outputs.repo_path }}"
+          REPO_NAME=$(basename "$REPO_PATH")
+
+          echo "=== Git 状态 ==="
+          echo "当前目录: $(pwd)"
+          ls -la apps/custom/
+
+          echo ""
+          echo "=== 检查 git status ==="
+          git status
+
+          echo ""
+          if ! git diff --quiet apps/custom/ 2>/dev/null; then
+            echo "检测到变化，正在提交..."
+            git config user.name "GitHub Actions"
+            git config user.email "actions@github.com"
+            git add "apps/custom/$REPO_NAME"
+            git status
+            git commit -m "add: $REPO_NAME plugins ($(date +%Y%m%d))"
+            git push
+            echo "✅ 已推送: apps/custom/$REPO_NAME"
+          else
+            echo "检测到变化，正在提交..."
+            git config user.name "GitHub Actions"
+            git config user.email "actions@github.com"
+            git add -A apps/custom/
+            git status
+            git commit -m "add: $REPO_NAME plugins ($(date +%Y%m%d))"
+            git push
+            echo "✅ 已推送: apps/custom/$REPO_NAME"
+          fi
+
+  clear-plugins:
+    needs: [determine-repo, list-plugins]
+    if: github.event.inputs.action == 'clear'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Clear Specific Plugin Repo
+        run: |
+          REPO_PATH="${{ needs.determine-repo.outputs.repo_path }}"
+          REPO_NAME=$(basename "$REPO_PATH")
+
+          echo "=== 清空仓库: $REPO_NAME ==="
+
+          # 检查目录是否存在
+          if [ ! -d "apps/custom/$REPO_NAME" ]; then
+            echo "⚠️  apps/custom/$REPO_NAME 不存在，跳过"
+            echo "无需提交"
+            exit 0
+          fi
+
+          # 删除指定的仓库目录
+          rm -rf "apps/custom/$REPO_NAME"
+          echo "✅ 已删除 apps/custom/$REPO_NAME"
+
+          echo ""
+          echo "=== 剩余仓库 ==="
+          ls -la apps/custom/ 2>/dev/null || echo "目录为空"
+
+          echo ""
+          echo "=== 检查变化 ==="
+          if ! git diff --quiet apps/custom/ 2>/dev/null; then
+            echo "检测到变化，正在提交..."
+            git config user.name "GitHub Actions"
+            git config user.email "actions@github.com"
+            git add apps/custom/
+            git status
+            git commit -m "chore: clear $REPO_NAME plugins"
+            git push
+            echo "✅ 已推送清空操作: $REPO_NAME"
+          else
+            echo "无需提交"
+          fi

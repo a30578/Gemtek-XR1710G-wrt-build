@@ -1,0 +1,130 @@
+name: Sync Target Files
+run-name: Sync XR1710G Target Files
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: '操作 / Action'
+        type: choice
+        required: true
+        default: 'sync'
+        options:
+          - sync
+          - diff
+
+jobs:
+  sync-target:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Clone XR1710G Source
+        uses: actions/checkout@v4
+        with:
+          repository: lvcdy/openwrt_xr1710g
+          path: ./tmp-xr1710g-source
+          token: ${{ github.token }}
+          fetch-depth: 1
+
+      - name: Show Source Files
+        run: |
+          echo "=== target/linux/airoha/ ==="
+          echo "文件数量: $(find ./tmp-xr1710g-source/target/linux/airoha -type f | wc -l)"
+          find ./tmp-xr1710g-source/target/linux/airoha -type f | head -20
+
+          echo ""
+          echo "=== package/boot/uboot-airoha/ ==="
+          echo "文件数量: $(find ./tmp-xr1710g-source/package/boot/uboot-airoha -type f | wc -l)"
+          find ./tmp-xr1710g-source/package/boot/uboot-airoha -type f
+
+      - name: Diff (if needed)
+        if: github.event.inputs.action == 'diff'
+        run: |
+          for dir in "target/linux/airoha" "package/boot/uboot-airoha"; do
+            if [ -d "$dir" ]; then
+              echo "=== 本地 $dir 与 lvcdy 差异 ==="
+              diff -rq "./tmp-xr1710g-source/$dir" "./$dir" 2>/dev/null || true
+            else
+              echo "$dir 不存在，将全部新增"
+            fi
+            echo ""
+          done
+
+      - name: Sync Target and U-Boot Files
+        if: github.event.inputs.action == 'sync'
+        run: |
+          echo "=== 同步 target/linux/airoha/ ==="
+
+          # 备份
+          if [ -d "target/linux/airoha" ]; then
+            mkdir -p target/linux/airoha.bak
+            rm -rf target/linux/airoha.bak/*
+            cp -r target/linux/airoha/* target/linux/airoha.bak/
+            echo "已备份旧 target 到 target/linux/airoha.bak/"
+          fi
+
+          # 复制 target
+          mkdir -p target/linux/airoha
+          rm -rf target/linux/airoha/*
+          cp -r ./tmp-xr1710g-source/target/linux/airoha/* target/linux/airoha/
+          rm -rf target/linux/airoha/.git 2>/dev/null || true
+
+          echo ""
+          echo "=== 同步 package/boot/uboot-airoha/ ==="
+
+          # 备份
+          if [ -d "package/boot/uboot-airoha" ]; then
+            mkdir -p package/boot/uboot-airoha.bak
+            rm -rf package/boot/uboot-airoha.bak/*
+            cp -r package/boot/uboot-airoha/* package/boot/uboot-airoha.bak/
+            echo "已备份旧 uboot-airoha 到 package/boot/uboot-airoha.bak/"
+          fi
+
+          # 复制 uboot-airoha（Makefile + patches + files/ 全部需要）
+          mkdir -p package/boot/uboot-airoha
+          rm -rf package/boot/uboot-airoha/*
+          cp -r ./tmp-xr1710g-source/package/boot/uboot-airoha/* package/boot/uboot-airoha/
+          rm -rf package/boot/uboot-airoha/.git 2>/dev/null || true
+
+          echo ""
+          echo "=== 关键文件验证 ==="
+          for f in \
+            "target/linux/airoha/dts/an7581-xr1710g-ubi.dts" \
+            "target/linux/airoha/dts/an7581-gemtek-17xx-common.dtsi" \
+            "target/linux/airoha/image/an7581.mk" \
+            "package/boot/uboot-airoha/patches/999-00-airoha-add-gemtek-xr1710g.patch" \
+            "package/boot/uboot-airoha/patches/999-01-airoha-add-gemtek-xr2010g.patch" \
+            "package/boot/uboot-airoha/files/an7581-bl2.bin" \
+            "package/boot/uboot-airoha/files/an7581-bl31.bin"; do
+            if [ -f "$f" ]; then
+              echo "✅ $f"
+            else
+              echo "❌ $f 缺失"
+            fi
+          done
+
+      - name: Commit and Push
+        if: github.event.inputs.action == 'sync'
+        run: |
+          echo "=== Git 状态 ==="
+          CHANGES=$(git status --porcelain | grep -E "target/linux/|package/boot/uboot-airoha/")
+
+          if [ -z "$CHANGES" ]; then
+            echo "没有变化，无需提交"
+          else
+            echo "$CHANGES"
+            echo ""
+            echo "检测到变化，正在提交..."
+            git config user.name "GitHub Actions"
+            git config user.email "actions@github.com"
+            git add target/linux/airoha/ package/boot/uboot-airoha/
+            git commit -m "sync: target + uboot-airoha from lvcdy/openwrt_xr1710g ($(date +%Y%m%d))"
+            git push
+            echo "✅ 已推送"
+          fi
+
+          rm -rf tmp-xr1710g-source

@@ -1,0 +1,20 @@
+config interface 'loopback'
+    option device 'lo'
+    option proto 'static'
+    option ipaddr '127.0.0.1'
+    option netmask '255.0.0.0'
+
+config interface 'lan'
+    option device 'lan1 lan2 lan3 lan4'
+    option proto 'static'
+    option ipaddr '__LAN_IP__'
+    option netmask '255.255.255.0'
+    option ip6assign '60'
+
+config interface 'wan'
+    option device 'wan'
+    option proto 'dhcp'
+
+config interface 'wan6'
+    option device 'wan'
+    option proto 'dhcpv6'

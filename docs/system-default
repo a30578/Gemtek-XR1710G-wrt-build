@@ -1,0 +1,34 @@
+config system
+    option hostname '__HOSTNAME__'
+    option timezone 'CST-8'
+    option ttylogin '0'
+    option log_size '64'
+    option log_ip '0.0.0.0'
+    option urandom_seed '0'
+
+config timeserver 'ntp'
+    option enabled '1'
+    list server '0.openwrt.pool.ntp.org'
+    list server '1.openwrt.pool.ntp.org'
+    list server '2.openwrt.pool.ntp.org'
+    list server '3.openwrt.pool.ntp.org'
+
+config led 'led_eth'
+    option name 'ETH'
+    list sysfs 'airoha:white:eth'
+    option default '1'
+
+config led 'led_wlan_2g'
+    option name '2.4G'
+    list sysfs 'airoha:white:wlan24'
+    option default '0'
+
+config led 'led_wlan_5g'
+    option name '5G'
+    list sysfs 'airoha:white:wlan59'
+    option default '0'
+
+config led 'led_wlan_6g'
+    option name '6G'
+    list sysfs 'airoha:white:wlan60'
+    option default '0'
