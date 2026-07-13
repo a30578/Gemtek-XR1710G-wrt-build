@@ -114,7 +114,7 @@ jobs:
         if: github.event.inputs.action == 'sync'
         run: |
           echo "=== Git 状态 ==="
-          CHANGES=$(git status --porcelain | grep -E "target/linux/|package/boot/uboot-airoha/")
+          CHANGES=$(git status --porcelain | grep -E "target/linux/|package/boot/uboot-airoha/" || true)
 
           if [ -z "$CHANGES" ]; then
             echo "没有变化，无需提交"
