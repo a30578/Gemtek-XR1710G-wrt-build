@@ -1,0 +1,423 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:894
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:895
+msgid "(Received Signal Strength Indicator)"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:915
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:916
+msgid "(Reference Signal Receive Power)"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:957
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:958
+msgid "(Reference Signal Received Quality)"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:873
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:874
+msgid "(Signal Strength)"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:936
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:937
+msgid "(Signal to Interference plus Noise Ratio)"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:252
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:253
+msgid "3ginfo-lite"
+msgstr ""
+
+#: root/usr/share/luci/menu.d/luci-app-3ginfo.json:43
+msgid "AT command"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:985
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:986
+msgid "CA band (S1)"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:997
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:998
+msgid "CA band (S2)"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:1009
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:1010
+msgid "CA band (S3)"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:1021
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:1022
+msgid "CA band (S4)"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:870
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:871
+msgid "CSQ"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:809
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:810
+msgid "Cell / Signal Information"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:831
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:832
+msgid "Cell ID"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:131
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:161
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:131
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:161
+msgid "Cell edge"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:802
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:803
+msgid "Chip Temperature"
+msgstr ""
+
+#: root/usr/share/luci/menu.d/luci-app-3ginfo.json:52
+msgid "Configuration"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gconfig.js:26
+msgid "Configuration 3ginfo-lite"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gconfig.js:26
+msgid "Configuration panel for the 3ginfo-lite application."
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:724
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:725
+msgid "Connection statistics"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:634
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:635
+msgid "Error:"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:119
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:149
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:119
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:149
+msgid "Excellent"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:649
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:650
+msgid "General Information"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:31
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:63
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:96
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:123
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:153
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:31
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:63
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:96
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:123
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:153
+msgid "Good"
+msgstr ""
+
+#: root/usr/share/rpcd/acl.d/luci-app-3ginfo.json:3
+msgid "Grant access to LuCI app 3ginfo-lite"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:777
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:778
+msgid "IP adress / Communication Port"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gconfig.js:41
+msgid "IP adress / Port for communication with the modem"
+msgstr ""
+
+#: root/usr/share/luci/menu.d/luci-app-3ginfo.json:12
+msgid "Information about 3G/4G/5G modems"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:855
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:856
+msgid "LAC"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:819
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:820
+msgid "MCC MNC"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:127
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:157
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:127
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:157
+msgid "Mid cell"
+msgstr ""
+
+#: root/usr/share/luci/menu.d/luci-app-3ginfo.json:3
+msgid "Modem"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:177
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:183
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:177
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:183
+msgid "Modem IMEI"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:743
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:744
+msgid "Modem Information"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:753
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:754
+msgid "Modem type"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:638
+#: root/usr/share/luci/menu.d/luci-app-3ginfo.json:25
+msgid "Modem1 Details"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:639
+#: root/usr/share/luci/menu.d/luci-app-3ginfo.json:34
+msgid "Modem2 Details"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gconfig.js:33
+msgid "Network"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gconfig.js:34
+msgid "Network interface for Internet access."
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:331
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:332
+msgid "Not registered"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:671
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:672
+msgid "Operator"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gconfig.js:49
+msgid "Please select a port"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:973
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:974
+msgid "Primary band | PCI & EARFCN"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:207
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:207
+msgid "Problem with registering to the network, check the SIM card."
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:789
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:790
+msgid "Protocol"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:912
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:913
+msgid "RSRP"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:954
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:955
+msgid "RSRQ"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:891
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:892
+msgid "RSSI"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:334
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:335
+msgid "Registered"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:343
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:344
+msgid "Registered (roaming)"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:340
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:341
+msgid "Registering denied"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:765
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:766
+msgid "Revision / Firmware"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:176
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:182
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:176
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:182
+msgid "SIM ICCID"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:175
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:181
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:175
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:181
+msgid "SIM IMSI"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:210
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:210
+msgid "SIM PIN required"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:225
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:225
+msgid "SIM PIN2 required"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:213
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:213
+msgid "SIM PUK required"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:228
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:228
+msgid "SIM PUK2 required"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:174
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:174
+msgid "SIM Slot"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:219
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:219
+msgid "SIM busy"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:216
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:216
+msgid "SIM failure"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:683
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:684
+msgid "SIM status"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:222
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:222
+msgid "SIM wrong"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:933
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:934
+msgid "SINR"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:337
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:338
+msgid "Searching.."
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gconfig.js:42
+msgid ""
+"Select the appropriate settings. <br /> <br />Traditional modem. <br /> "
+"Select one of the available ttyUSBX ports.<br /> <br />HiLink modem. <br /> "
+"Enter the IP address 192.168.X.X under which the modem is available."
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/atcommand.js:84
+msgid "Send AT command:"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/atcommand.js:87
+msgid "Sending AT command to selected device com port."
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:659
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:660
+msgid "Signal strength"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:843
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:844
+msgid "TAC"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:736
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:737
+msgid "Technology"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:237
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:237
+msgid ""
+"There is a problem reading connection data. <br /><br /><b>Please check:</b> "
+"<ul><li>1. Connection of the modem to the internet, the correctness of the "
+"entered APN. Some modems need to force the APN on the modem using at "
+"commands to connect to internet.</li><li> 2. Check that the correct "
+"interface assigned to the modem is selected. The default name of the "
+"interface in the package is wan.</li><li><ul>"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:231
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:231
+msgid ""
+"There is a problem reading data from the modem. <br /><br /><b>Please check:"
+"</b> <ul><li>1. Modem availability in the system.</li><li>2. The correct "
+"installation of the SIM card in the modem.</li><li> 3. Port for "
+"communication with the modem.</li><li><ul>"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:27
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:59
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:92
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:27
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:59
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:92
+msgid "Very good"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:39
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:71
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:104
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:39
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:71
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:104
+msgid "Very weak"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:302
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:303
+msgid "Waiting for connection data..."
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:255
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:256
+msgid "Waiting to read data from the modem..."
+msgstr ""
+
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:35
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:67
+#: htdocs/luci-static/resources/view/modem/3gdetail.js:100
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:35
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:67
+#: htdocs/luci-static/resources/view/modem/3gdetail1.js:100
+msgid "Weak"
+msgstr ""

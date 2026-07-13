@@ -1,0 +1,114 @@
+#!/bin/sh
+
+touch /etc/crontabs/root
+
+uci set luci.main.lang=zh_cn
+#设置默认主题
+#uci set luci.main.mediaurlbase=/luci-static/bootstrap_mod
+uci commit luci
+
+uci set system.@system[0].timezone=CST-8
+uci set system.@system[0].zonename=Asia/Shanghai
+uci commit system
+
+uci set fstab.@global[0].anon_mount=1
+uci commit fstab
+
+ln -sf /sbin/ip /usr/bin/ip
+
+sed -i '/lienol/d' /etc/opkg/distfeeds.conf
+sed -i '/other/d' /etc/opkg/distfeeds.conf
+#sed -i 's/downloads.openwrt.org/openwrt.proxy.ustclug.org/g' /etc/opkg/distfeeds.conf
+#sed -i 's/http/https/g' /etc/opkg/distfeeds.conf
+sed -i "s/# //g" /etc/opkg/distfeeds.conf
+sed -i '/check_signature/d' /etc/opkg.conf
+
+#sed -i 's/root::0:0:99999:7:::/root:$1$V4UetPzk$CYXluq4wUazHjmCDBCqXF.:0:0:99999:7:::/g' /etc/shadow
+
+uci set dhcp.lan.ra='server'
+uci set dhcp.lan.dhcpv6='server'
+uci set dhcp.lan.ra_management='1'
+uci set dhcp.lan.ra_default='1'
+#uci set dhcp.@dnsmasq[0].localservice=0
+#uci set dhcp.@dnsmasq[0].nonwildcard=0
+uci commit dhcp
+
+#uci set network.lan.ipaddr='192.168.119.254'
+#uci set network.lan.netmask='255.255.255.0'
+uci set network.lan.ip6assign='64'
+uci commit network
+
+#DNS重定向
+sed -i '/REDIRECT --to-ports 53/d' /etc/firewall.user
+echo "# iptables -t nat -A PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 53" >> /etc/firewall.user
+
+sed -i '/option disabled/d' /etc/config/wireless
+sed -i '/set wireless.radio${devidx}.disabled/d' /lib/wifi/mac80211.sh
+wifi up
+
+# kenzo 构建标记
+# 关键：保留 DISTRIB_REVISION / DISTRIB_RELEASE 原值不动，apk/opkg 需要它们拼 feed URL
+# 在 DISTRIB_DESCRIPTION 末尾追加 kenzo 字串 + 新增独立字段 kenzo_build 供脚本读取
+kenzo_date="$(date +'%Y.%m.%d')"
+sed -i "s/^\(DISTRIB_DESCRIPTION='[^']*\)'/\1 by kenzo $kenzo_date'/" /etc/openwrt_release
+sed -i '/^kenzo_build=/d' /etc/openwrt_release
+echo "kenzo_build='v$kenzo_date'" >> /etc/openwrt_release
+
+# 同步把 kenzo_build 写进 banner，方便 ssh 登录时看见
+if [ -f /etc/banner ]; then
+    if grep -q "by kenzo" /etc/banner; then
+        sed -i "/by kenzo/c\\       build v$kenzo_date by kenzo" /etc/banner
+    else
+        sed -i "s|%D %V, %C|build v$kenzo_date by kenzo|" /etc/banner
+    fi
+fi
+
+# LuCI 版本字串改 kenzo 标记（纯界面字串，不影响包管理）
+if [ -f /usr/lib/lua/luci/version.lua ]; then
+    sed -i -e 's/ImmortalWrt/Openwrt/' -e 's/LuCI [^ ]*/kenzo/g' -e '/luciversion/d' /usr/lib/lua/luci/version.lua
+    echo "luciversion ='$kenzo_date'" >> /usr/lib/lua/luci/version.lua
+fi
+
+# 删除状态页不需显示的
+rm -rf /usr/lib/lua/luci/view/admin_status/index
+#mv -f /usr/lib/lua/luci/view/admin_status/index /usr/lib/lua/luci/view/admin_status/index_backup 2>/dev/null
+
+#禁用某些可能会自启动且用不上的依赖包服务
+/etc/init.d/php7-fastcgi disable 2>/dev/null
+/etc/init.d/php7-fpm disable 2>/dev/null
+/etc/init.d/php8-fastcgi disable 2>/dev/null
+/etc/init.d/php8-fpm disable 2>/dev/null
+/etc/init.d/softethervpnbridge disable 2>/dev/null
+/etc/init.d/softethervpnserver disable 2>/dev/null
+/etc/init.d/softethervpnclient disable 2>/dev/null
+/etc/init.d/haproxy disable 2>/dev/null
+/etc/init.d/kcptun disable 2>/dev/null
+
+chmod 0755 /etc/init.d/*
+
+sed -i.bak '/^option overlay_root \/overlay/s/^/#/' /etc/opkg.conf
+
+# 自家 dllkids feed：旧地址 op.dllkids.xyz/packages/x86_64 已 403 下线，
+# 新 layout 是 https://down.dllkids.xyz/openwrt-feed/<SDK>/<arch>/。
+# 按包管理器选 SDK（apk=25.12 / opkg=24.10），按 print-arch 动态拿 arch，
+# 避免硬编码 x86_64 把 nanopi / arm 设备坑死。
+if command -v apk >/dev/null 2>&1; then
+    _dl_arch="$(apk --print-arch 2>/dev/null)"
+    _dl_file="/etc/apk/repositories.d/distfeeds.list"
+    _dl_line="https://down.dllkids.xyz/openwrt-feed/25.12/${_dl_arch}/packages.adb"
+elif command -v opkg >/dev/null 2>&1; then
+    _dl_arch="$(opkg print-architecture 2>/dev/null | awk '$1=="arch" && $2!="all" && $2!="noarch" { if ($3+0>best) { best=$3+0; arch=$2 } } END { print arch }')"
+    _dl_file="/etc/opkg/distfeeds.conf"
+    _dl_line="src/gz dllkids_smpackage https://down.dllkids.xyz/openwrt-feed/24.10/${_dl_arch}"
+else
+    _dl_arch=""
+fi
+if [ -n "$_dl_arch" ] && [ -f "$_dl_file" ]; then
+    # 先清掉所有 dllkids 旧行（op.dllkids 死链 / 重复 down.dllkids），再追加一条新的
+    sed -i.bak '/dllkids\.xyz/d' "$_dl_file"
+    echo "$_dl_line" >> "$_dl_file"
+fi
+
+rm -rf /tmp/luci-*cache
+
+exit 0
